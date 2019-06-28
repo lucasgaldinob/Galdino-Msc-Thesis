@@ -1,0 +1,60 @@
+%This script is used to analyze the overall activity in the elevated-zero
+%maze and nest box. 
+
+%Requirements:
+    %Data is generated based on 10 min of recording. 
+    %Fs=1000Hz;
+    %Data lenght = 600(seconds) * 1000 = 60000 values.
+    %Number of electrodes = 5. Named as AD01, AD02, AD03, AD04 and AD05.
+
+clear; close all; clc;
+
+
+%% Import .m data containing Local Field Potentials values.
+[FileName,PathName] = uigetfile('*.mat','Select the .MAT');
+File = strcat(PathName,FileName);
+load(File);
+clear File PathName FileName;
+%Transform each electrode signal into a same cell called data.
+Data={AD01 AD02 AD03 AD04 AD05};
+clear AD01 AD02 AD03 AD04 AD05;
+
+%Load data parameters;
+Fs=1000;
+% T=length(s);
+
+
+%% Load event marker to start data based on first time on closed arm
+%(Elevated-zero maze)
+[FileName,PathName] = uigetfile('*.txt','Select the .MAT');
+File = strcat(PathName,FileName);
+load(File);
+clear File PathName FileName;
+
+%Load data parameters;
+Fs=1000;
+% T=length(s);
+
+%%Generate LFP data regarding 10 min of recording. Data starts when the
+%%animal was placed on the closed arm (based on the first event marker).
+j=round(GBR1_Event_Closed(1,1)); %First event (marker in the closed arm)
+
+%Loop to create a 60000 values data.
+for i=1:length(Data)
+    Data{i}=Data{i}(j:(j+59999));
+end
+
+%Filtering data (1-100Hz) with 60Hz notch filter.
+for i=1:length(Data)
+    Bandpass{i}=Band(Data{i});
+    Data_Filtered{i}=Notch(Bandpass{1});
+end
+
+
+%FFT - Fast fourier transform
+for i=1:length(Data_Filtered)
+    Data_F_FFT{i}=abs(fft(Data_Filtered{i}));
+    Data_F_Env{i}=hilbert(Data_F_FFT{i});
+end
+
+
