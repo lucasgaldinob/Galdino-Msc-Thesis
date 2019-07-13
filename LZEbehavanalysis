@@ -1,0 +1,112 @@
+% Created by Lucas Galdino and Lucas de Melo.
+% lucas.galdinob@gmail.com / lucas@edu.isd.org.br
+% lucasm@edu.isd.org.br 
+% Code created to analyze behavioral data from Plexon Systems. It's applyed
+% for those apparatus which measures displacement based on 'x' and 'y'
+% axis. 
+% This routine was previously created to Elevated-zero Maze, but it can be
+% applied for Open Field (if you are interested in events which separates
+% the data into two events based on two different segments of the
+% apparatus.
+
+clear; clc; close all;
+
+%% Import data into a struct;
+[File,PathName,FilterIndex] = uigetfile({'*.*','CSV(*.*)'}, 'Selecione seu banco em formato CSV ','MultiSelect','on');
+data = [PathName File];
+nanimais=length(File);
+
+Fs = 80;                                                                    %Sampling rate;
+T = 1/Fs;                                                                   %Time;
+
+%Create a structure based on the parameters defined above
+for i=1:nanimais
+    datastruct(i)=importdata([PathName File{:,i}]);
+end
+
+
+%% Displacement
+% Struct with x and y position of the Closed Arm.
+ for i=1:nanimais
+    k=0;
+    for j=1:length(datastruct(i).data)
+        if datastruct(i).data(j,6) == 1
+        k=k+1;
+        Closed(i).data(k,1) = datastruct(i).data(j,4);
+        Closed(i).data(k,2) = datastruct(i).data(j,5);
+        Closed(i).data(k,3) = datastruct(i).data(j,7);
+      
+       elseif datastruct(i).data(j,6) ~= 1
+       end
+    end
+ end
+
+% Struct with x and y position of the Open Arm.
+for i=1:nanimais
+    k=0;
+    for j=1:length(datastruct(i).data)
+       if datastruct(i).data(j,8) == 1
+        k=k+1;
+        Open(i).data(k,1) = datastruct(i).data(j,4);
+        Open(i).data(k,2) = datastruct(i).data(j,5);
+        Open(i).data(k,3) = datastruct(i).data(j,9);
+
+       elseif datastruct(i).data(j,8) ~= 1
+       end
+    end
+end
+
+%% LZE output
+%Time
+for i=1:nanimais
+    nframes(i)=length(datastruct(i).data);
+    
+    TempoC(i).data=(sum(datastruct(i).data(nframes(i)-48000:nframes(i),6))/80);
+    TempoO(i).data=(sum(datastruct(i).data(nframes(i)-48000:nframes(i),8))/80);
+    TempoTotal(i).data=TempoC(i).data+TempoO(i).data;
+end
+
+
+for i=1:nanimais
+    C(i).data=Closed(i).data(:,3);
+end
+for i=1:nanimais
+    O(i).data=Open(i).data(:,3);
+end
+
+ % Number of entries in the Open Closed
+for i=1:nanimais
+    Entries_C(i).data=0;
+    
+    for j=2:length(C(i).data)
+        if C(i).data(j)<C(i).data(j-1)
+            CD(i).data(j)=0;
+            Entries_C(i).data=Entries_C(i).data+1;  %Structure containing the input values for the Closed Arm.
+            
+            continue;
+        end
+        CD(i).data(j)=C(i).data(j)-C(i).data(j-1);
+    end
+end
+
+ % Number of entries in the Open Closed
+for i=1:nanimais
+    Entries_O(i).data=0;
+    for j=2:length(O(i).data)
+        if O(i).data(j)<O(i).data(j-1)
+            OD(i).data(j)=0;
+            Entries_O(i).data=Entries_O(i).data+1; %Structure containing the input values for the Open Arm.             
+            
+            continue;
+        end
+        OD(i).data(j)=O(i).data(j)-O(i).data(j-1);
+    end
+end
+
+%Distance
+for i=1:nanimais
+    Dist_O(i).data=sum(OD(i).data); %Distance in the Open Arm 
+    Dist_C(i).data=sum(CD(i).data); %Distance in the Closed Arm 
+    Dist_total(i).data=Dist_O(i).data+Dist_C(i).data; %
+end
+
