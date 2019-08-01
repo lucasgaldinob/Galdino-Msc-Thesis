@@ -1,60 +1,228 @@
 %This script is used to analyze the overall activity in the elevated-zero
 %maze and nest box. 
-
+% Created by Lucas Galdino
+% lucas.galdinob@gmail.com / lucas@edu.isd.org.br
+% 
 %Requirements:
-    %Data is generated based on 10 min of recording. 
+    %Data generated based on 10 min of recording each electrode. 
     %Fs=1000Hz;
     %Data lenght = 600(seconds) * 1000 = 60000 values.
     %Number of electrodes = 5. Named as AD01, AD02, AD03, AD04 and AD05.
-
+    %The raw data has more than 10 min of recording, this is solved usind
+    %the first insertion of the animal in the closed arm (LZE).
 clear; close all; clc;
 
 
-%% Import .m data containing Local Field Potentials values.
-[FileName,PathName] = uigetfile('*.mat','Select the .MAT');
-File = strcat(PathName,FileName);
-load(File);
-clear File PathName FileName;
-%Transform each electrode signal into a same cell called data.
-Data={AD01 AD02 AD03 AD04 AD05};
-clear AD01 AD02 AD03 AD04 AD05;
+%% Nest box LFP data import (CONTROL GROUP)
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select the data .mat regarding control group','MultiSelect','on');
+data = [PathName File];
+nanimaisSal=length(File);
 
-%Load data parameters;
-Fs=1000;
-% T=length(s);
+%Create a structure based on the parameters defined above
+for i=1:nanimaisSal
+    Data_SAL(i).data=importdata([PathName File{:,i}]);
+end
+
+for i=1:nanimaisSal
+        Data_SAL(i).data.AD01=Data_SAL(i).data.AD01(1:600000,:);
+        Data_SAL(i).data.AD02=Data_SAL(i).data.AD02(1:600000,:);
+        Data_SAL(i).data.AD03=Data_SAL(i).data.AD03(1:600000,:);
+        Data_SAL(i).data.AD04=Data_SAL(i).data.AD04(1:600000,:);
+        Data_SAL(i).data.AD05=Data_SAL(i).data.AD05(1:600000,:);
+end
+clear data File FilterIndex i nanimais PathName;
+
+
+
+%% Nest box LFP data import (GBR GROUP)
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select the data .mat regarding experimental group','MultiSelect','on');
+data = [PathName File];
+nanimaisGBR=length(File);
+
+%Create a structure based on the parameters defined above
+for i=1:nanimaisGBR
+    Data_GBR(i).data=importdata([PathName File{:,i}]);
+end
+
+for i=1:nanimaisGBR
+        Data_GBR(i).data.AD01=Data_GBR(i).data.AD01(1:600000,:);
+        Data_GBR(i).data.AD02=Data_GBR(i).data.AD02(1:600000,:);
+        Data_GBR(i).data.AD03=Data_GBR(i).data.AD03(1:600000,:);
+        Data_GBR(i).data.AD04=Data_GBR(i).data.AD04(1:600000,:);
+        Data_GBR(i).data.AD05=Data_GBR(i).data.AD05(1:600000,:);
+end
+clear data File FilterIndex i nanimais PathName;
 
 
 %% Load event marker to start data based on first time on closed arm
-%(Elevated-zero maze)
-[FileName,PathName] = uigetfile('*.txt','Select the .MAT');
-File = strcat(PathName,FileName);
-load(File);
-clear File PathName FileName;
+% (Elevated-zero maze)
+% [FileName,PathName] = uigetfile('*.txt','Select the .CSV');
+% File = strcat(PathName,FileName);
+% load(File);
+% clear File PathName FileName;
+% 
+% %%Generate LFP data regarding 10 min of recording. Data starts when the
+% %%animal was placed on the closed arm (based on the first event marker).
+% j=round(GBR1_Event_Closed(1,1)); %First event (marker in the closed arm)
+% 
+% %10 min after starting the experiment (first event inside closed arm)
+% Data=Data(j:j+599999,:);
 
-%Load data parameters;
-Fs=1000;
-% T=length(s);
-
-%%Generate LFP data regarding 10 min of recording. Data starts when the
-%%animal was placed on the closed arm (based on the first event marker).
-j=round(GBR1_Event_Closed(1,1)); %First event (marker in the closed arm)
-
-%Loop to create a 60000 values data.
-for i=1:length(Data)
-    Data{i}=Data{i}(j:(j+59999));
-end
-
-%Filtering data (1-100Hz) with 60Hz notch filter.
-for i=1:length(Data)
-    Bandpass{i}=Band(Data{i});
-    Data_Filtered{i}=Notch(Bandpass{1});
+for i=1:nanimaisGBR
+        Data_SAL_Filt(i).data.AD01=Band(Notch(Data_SAL(i).data.AD01));
+        Data_SAL_Filt(i).data.AD02=Band(Notch(Data_SAL(i).data.AD02));
+        Data_SAL_Filt(i).data.AD03=Band(Notch(Data_SAL(i).data.AD03));
+        Data_SAL_Filt(i).data.AD04=Band(Notch(Data_SAL(i).data.AD04));
+        Data_SAL_Filt(i).data.AD05=Band(Notch(Data_SAL(i).data.AD05));
 end
 
 
-%FFT - Fast fourier transform
-for i=1:length(Data_Filtered)
-    Data_F_FFT{i}=abs(fft(Data_Filtered{i}));
-    Data_F_Env{i}=hilbert(Data_F_FFT{i});
+for i=1:nanimaisGBR
+        Data_GBR_Filt(i).data.AD01=Band(Notch(Data_GBR(i).data.AD01));
+        Data_GBR_Filt(i).data.AD02=Band(Notch(Data_GBR(i).data.AD02));
+        Data_GBR_Filt(i).data.AD03=Band(Notch(Data_GBR(i).data.AD03));
+        Data_GBR_Filt(i).data.AD04=Band(Notch(Data_GBR(i).data.AD04));
+        Data_GBR_Filt(i).data.AD05=Band(Notch(Data_GBR(i).data.AD05));
 end
 
+%% 
+fs = 1000; % sampling/recording frequency
+t1 = 0 : 1/fs : 1; % time 0 to 1s at 1/sampling frequency steps
+t2 = 0 : 1/fs : 0.499; % time 0 to 0.49s at 1/sampling frequency steps
+t3 = 0.5 : 1/fs : 1; % time 0.5 to 1s at 1/sampling frequency steps
 
+%Applying FFT to each animal per electrode (OUTPUT -> Pw and Fw)
+for i=1:nanimaisGBR
+    window=fs;
+    noverlap=128;
+    nfft=fs*2;
+    h = spectrum.welch('Hann',window,100*noverlap/window);
+    hpsd(:,i) = psd(h,Data_GBR_Filt(i).data.AD01,'NFFT',nfft,'fs',fs);
+    PwGBRAD01(:,i) = hpsd(:,i).Data; %Power
+    Fw= hpsd(:,i).Frequencies; %Frequency
+    
+    hpsd(:,i) = psd(h,Data_GBR_Filt(i).data.AD02,'NFFT',nfft,'fs',fs);
+    PwGBRAD02(:,i) = hpsd(:,i).Data; %Power
+    
+    h = spectrum.welch('Hann',window,100*noverlap/window);
+    hpsd(:,i) = psd(h,Data_GBR_Filt(i).data.AD03,'NFFT',nfft,'fs',fs);
+    PwGBRAD03(:,i) = hpsd(:,i).Data; %Power
+    
+    hpsd(:,i) = psd(h,Data_GBR_Filt(i).data.AD04,'NFFT',nfft,'fs',fs);
+    PwGBRAD04(:,i) = hpsd(:,i).Data; %Power
+    
+    hpsd(:,i) = psd(h,Data_GBR_Filt(i).data.AD05,'NFFT',nfft,'fs',fs);
+    PwGBRAD05(:,i) = hpsd(:,i).Data; %Power
+end
+
+for i=1:nanimaisSal
+    window=fs;
+    noverlap=128;
+    nfft=fs*2;
+    h = spectrum.welch('Hann',window,100*noverlap/window);
+    hpsd(:,i) = psd(h,Data_SAL_Filt(i).data.AD01,'NFFT',nfft,'fs',fs);
+    PwSALAD01(:,i) = hpsd(:,i).Data; %Power
+    Fw= hpsd(:,i).Frequencies; %Frequency
+    
+    hpsd(:,i) = psd(h,Data_SAL_Filt(i).data.AD02,'NFFT',nfft,'fs',fs);
+    PwSALAD02(:,i) = hpsd(:,i).Data; %Power
+    
+    h = spectrum.welch('Hann',window,100*noverlap/window);
+    hpsd(:,i) = psd(h,Data_SAL_Filt(i).data.AD03,'NFFT',nfft,'fs',fs);
+    PwSALAD03(:,i) = hpsd(:,i).Data; %Power
+    
+    hpsd(:,i) = psd(h,Data_SAL_Filt(i).data.AD04,'NFFT',nfft,'fs',fs);
+    PwSALAD04(:,i) = hpsd(:,i).Data; %Power
+    
+    hpsd(:,i) = psd(h,Data_SAL_Filt(i).data.AD05,'NFFT',nfft,'fs',fs);
+    PwSALAD05(:,i) = hpsd(:,i).Data; %Power
+end
+
+%% Applying FFT average
+PwGBRAD01M=mean(PwGBRAD01');
+PwGBRAD02M=mean(PwGBRAD02');
+PwGBRAD03M=mean(PwGBRAD03');
+PwGBRAD04M=mean(PwGBRAD04');
+PwGBRAD05M=mean(PwGBRAD05');
+
+PwSALAD01M=mean(PwSALAD01');
+PwSALAD02M=mean(PwSALAD02');
+PwSALAD03M=mean(PwSALAD03');
+PwSALAD04M=mean(PwSALAD04');
+PwSALAD05M=mean(PwSALAD05');
+
+subplot (321)
+plot (Fw,PwSALAD01M)
+hold on 
+plot (Fw,PwGBRAD01M)
+ylim([0 0.12]);
+xlim ([0 50]);
+subplot (322)
+plot (Fw,PwSALAD02M)
+hold on 
+plot (Fw,PwGBRAD02M)
+ylim([0 0.1]);
+xlim ([0 50]);
+subplot (323)
+plot (Fw,PwSALAD03M)
+hold on 
+plot (Fw,PwGBRAD03M)
+ylim([0 0.1]);
+xlim ([0 50]);
+subplot (324)
+plot (Fw,PwSALAD04M)
+hold on 
+plot (Fw,PwGBRAD04M)
+ylim([0 0.1]);
+xlim ([0 50]);
+subplot (325)
+plot (Fw,PwSALAD05M)
+hold on 
+plot (Fw,PwGBRAD05M)
+ylim([0 0.14]);
+xlim ([0 50]);
+
+
+% plot (Fw,PwAD03Mean)
+% hold on 
+% plot (Fw,PwAD04Mean)
+% hold on 
+% plot (Fw,PwAD05Mean)
+% hold on 
+% title('spectrum.welch. Any key to continue')
+% xlabel('Frequency (Hz)')
+% ylabel('Power/Frequency (dB/Hz)')
+% axis tight;
+
+
+% SDDelta(:,i) = trapz(Pw(3:7,i));
+% SDTheta(:,i) = trapz(Pw(7:17,i));
+% SDBeta(:,i) = trapz(Pw(27:61,i));
+% SDLGamma(:,i) = trapz(Pw(61:131,i));
+% SDHGamma(:,i) = trapz(Pw(131:201,i));
+
+
+
+
+% 
+% figure(2)
+% plot (Fw,Pw);
+% title('spectrum.welch. Any key to continue')
+% xlabel('Frequency (Hz)')
+% ylabel('Power/Frequency (dB/Hz)')
+% axis tight;
+% ylim([0 0.4]);
+% xlim ([0 100]);
+
+
+
+%% Specgram plotting 
+% tl=(length(t1));
+% np=(2^nextpow2(tl));
+% spectrogram(Data_Filtered(1:6000,2),kaiser(np/2,.5),(np/2)-4,np/1,fs,'yaxis');
+% %Hann window.
+% ca=caxis;
+% caxis ([(ca(1)*0.25) (ca(2))]) 
+% ylim ([0 100]);
+% title('Spectrogram - GBR1');
+% 
