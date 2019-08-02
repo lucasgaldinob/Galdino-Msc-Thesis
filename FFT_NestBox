@@ -57,11 +57,11 @@ for i=1:nanimais
     window=fs;
     noverlap=128;
     nfft=fs*2;
-    h = spectrum.welch('Hann',window,100*noverlap/window);    
+    h = spectrum.welch('Hann',window,100*noverlap/window);
     for j=1:5
-    hpsd = psd(h,Data_Filt_CG{1, i}(:,j),'NFFT',nfft,'fs',fs);
-    Pw{1, i}(:,j) = hpsd.Data; %Power Spectrum Denstity per channel 
-    Fw = hpsd.Frequencies;
+        hpsd = psd(h,Data_Filt_CG{1, i}(:,j),'NFFT',nfft,'fs',fs);
+        Pw{1, i}(:,j) = hpsd.Data; %Power Spectrum Denstity per channel
+        Fw = hpsd.Frequencies;
     end
 end
 
