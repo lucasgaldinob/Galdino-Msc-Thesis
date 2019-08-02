@@ -1,0 +1,69 @@
+%This script is used to apply FFT into all nest box lfp data.
+% Created by Lucas Galdino
+% lucas.galdinob@gmail.com / lucas@edu.isd.org.br
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Requirements:
+    %Data generated based on 10 min of recording each electrode. 
+    %Fs=1000Hz;
+    %Data lenght = 600(seconds) * 1000 = 600000 values.
+    %Number of electrodes = 5. Named as AD01, AD02, AD03, AD04 and AD05.
+
+clear; close all; clc;
+
+%% Import LFP data (nest box only)
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select the data .mat regarding nest box LFP','MultiSelect','on');
+data = [PathName File];
+nanimais=length(File);
+
+%Create a structure based on the parameters defined above
+for i=1:nanimais
+    Data_SAL(i).data=importdata([PathName File{:,i}]);
+end
+
+
+for i=1:nanimais
+    %Loop to window signal into 10 minutes (600000 values)
+    Data_SAL(i).data.AD01=Data_SAL(i).data.AD01(1:600000,:);
+    Data_SAL(i).data.AD02=Data_SAL(i).data.AD02(1:600000,:);
+    Data_SAL(i).data.AD03=Data_SAL(i).data.AD03(1:600000,:);
+    Data_SAL(i).data.AD04=Data_SAL(i).data.AD04(1:600000,:);
+    Data_SAL(i).data.AD05=Data_SAL(i).data.AD05(1:600000,:);
+    
+    %Struct to cell loop (avoid electrode identification). 
+    Data_CG{1,i}(:,1)=Data_SAL(i).data.AD01;
+    Data_CG{1,i}(:,2)=Data_SAL(i).data.AD02;
+    Data_CG{1,i}(:,3)=Data_SAL(i).data.AD03;
+    Data_CG{1,i}(:,4)=Data_SAL(i).data.AD04;
+    Data_CG{1,i}(:,5)=Data_SAL(i).data.AD05;
+end
+clear data File FilterIndex i PathName Data_Sal;
+
+%Filter signal (1-100Hz bandpass and 60Hz notch).
+for i=1:nanimais
+    for j=1:5 %nelectrodes
+        Bandpass{:,i}(:,j)=Band(Data_CG{1, i}(:,j));
+        Data_Filt_CG{:,i}(:,j)=Notch(Bandpass{:,i}(:,j));
+    end
+end
+
+%FFT/Specgram parameters
+fs = 1000; % sampling/recording frequency
+t1 = 0 : 1/fs : 1; % time 0 to 1s at 1/sampling frequency steps
+t2 = 0 : 1/fs : 0.499; % time 0 to 0.49s at 1/sampling frequency steps
+t3 = 0.5 : 1/fs : 1; % time 0.5 to 1s at 1/sampling frequency steps
+
+%FFT
+for i=1:nanimais
+    window=fs;
+    noverlap=128;
+    nfft=fs*2;
+    h = spectrum.welch('Hann',window,100*noverlap/window);    
+    for j=1:5
+    hpsd = psd(h,Data_Filt_CG{1, i}(:,j),'NFFT',nfft,'fs',fs);
+    Pw{1, i}(:,j) = hpsd.Data; %Power Spectrum Denstity per channel 
+    Fw = hpsd.Frequencies;
+    end
+end
+
+
+    
