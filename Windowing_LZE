@@ -1,0 +1,59 @@
+clear; close all; clc;
+
+%% Import LFP data (nest box only)
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select the data .mat regarding Elevated-zero maze LFP','MultiSelect','on');
+data = [PathName File];
+nanimais=length(File);
+
+%Create a structure based on the parameters defined above
+for i=1:nanimais
+    Data_SAL(i).data=importdata([PathName File{:,i}]);
+end
+
+
+for i=1:nanimais
+    %Struct to cell loop (avoid electrode identification). 
+    LZE_CG{1,i}(:,1)=Data_SAL(i).data.AD01;
+    LZE_CG{1,i}(:,2)=Data_SAL(i).data.AD02;
+    LZE_CG{1,i}(:,3)=Data_SAL(i).data.AD03;
+    LZE_CG{1,i}(:,4)=Data_SAL(i).data.AD04;
+    LZE_CG{1,i}(:,5)=Data_SAL(i).data.AD05;
+end
+clear Data_SAL FilterIndex File data PathName i
+
+%% Load event marker to start data based on first time on closed arm
+%(Elevated-zero maze)
+[File,PathName,FilterIndex] = uigetfile({'*.*','CSV(*.*)'}, 'Selecione seu banco em formato CSV ','MultiSelect','on');
+data = [PathName File];
+nanimais=length(File);
+          
+%Create a structure based on the parameters defined above
+for i=1:nanimais
+    CSV_Tracking{i}=importdata([PathName File{:,i}]);
+end
+clear data File FilterIndex i PathName Data_Sal;
+
+
+%% Segmentation test
+Test=CSV_Tracking{1,1};
+
+for j=1:(length(Test)-800)
+    if Test(j,6)==1 && Test((j+800),6)==1
+        TestX(j:j+800,1)=Test(j&(j+800),1);
+    end
+end
+
+
+% The aim is to perform a loop to identify the interval which the mouse
+% were inside the closed and open arm in the elevated-zero arm. The loop
+% consist in the following steps:
+% Step 1 - Found the first "one" in the 6th column and the last one on the
+% sequence;
+%Step 2 - Import the line value (start and end), but to 1st column
+%Step 3 - Keep looping inside this caralha to found the next interval of
+%ones 
+%Every time that a interval of ones is bigger than 80 cells (column 6), it
+%is considered an event.
+%
+
+    
