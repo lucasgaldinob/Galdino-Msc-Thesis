@@ -34,6 +34,15 @@ end
 clear data File FilterIndex i PathName Data_Sal;
 
 
+%% Filtering data
+for i=1:nanimais
+    for j=1:5 %nelectrodes
+        Bandpass{:,i}(:,j)=Band(LZE_CG{1, i}(:,j));
+        Data_Filt_CG{:,i}(:,j)=Notch(Bandpass{:,i}(:,j));
+    end
+end
+clear Bandpass i j 
+
 %% Segmentation test
 Test=CSV_Tracking{1,1};
 
@@ -50,10 +59,5 @@ end
 % Step 1 - Found the first "one" in the 6th column and the last one on the
 % sequence;
 %Step 2 - Import the line value (start and end), but to 1st column
-%Step 3 - Keep looping inside this caralha to found the next interval of
-%ones 
-%Every time that a interval of ones is bigger than 80 cells (column 6), it
-%is considered an event.
-%
 
     
