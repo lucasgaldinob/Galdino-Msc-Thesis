@@ -1,0 +1,116 @@
+clear 
+clc
+close all
+
+%% Data parameters
+Fs = 1000;
+Experiment_Time = 600; %600 seconds = 10 minutes
+
+%% Import Baseline SAL Data
+cd 'C:\Users\Galdino\OneDrive\Mestrado Neuroengenharia\Dissertação\Experimento 2 - Eletrofisiologia\Dados_GV9Jm2u7rmsCe65wKzPTw5jtS38n2tVEGiP'
+
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select Baseline file','MultiSelect','on');
+data = [PathName File];
+nanimais_SAL=length(File);
+
+%Create a structure based on the parameters defined above
+for i=1:nanimais_SAL
+    Baseline_Data(i)=importdata([PathName File{:,i}]);
+end
+clear File PathName FilterIndex data i
+
+%Loop to create 300
+for i=1:nanimais_SAL
+    Start=1;
+    End=2000;
+    j=2000;
+    for k=1:(Experiment_Time/2) %Where Experiment_Time is the duration of 
+        %the electrophysiological data and 2 is the window determined to windowing
+        
+        %Each line is a 2s window
+        Baseline_Segmented(i).PRL(k,:)=Baseline_Data(i).AD01(Start:End,:);
+        Baseline_Segmented(i).NAC(k,:)=Baseline_Data(i).AD02(Start:End,:);
+        Baseline_Segmented(i).VTA(k,:)=Baseline_Data(i).AD03(Start:End,:);
+        Baseline_Segmented(i).BLA(k,:)=Baseline_Data(i).AD04(Start:End,:);
+        Baseline_Segmented(i).HV(k,:)=Baseline_Data(i).AD05(Start:End,:);
+        Start=Start+j;
+        End=End+j;
+    end
+end
+clear Start End i j k Baseline_Data
+
+for i=1:nanimais_SAL
+        Baseline_SAL(i).PRL=mean(Baseline_Segmented(i).PRL);
+        Baseline_SAL(i).NAC=mean(Baseline_Segmented(i).NAC);
+        Baseline_SAL(i).VTA=mean(Baseline_Segmented(i).VTA);
+        Baseline_SAL(i).BLA=mean(Baseline_Segmented(i).BLA);
+        Baseline_SAL(i).HV=mean(Baseline_Segmented(i).HV);
+end
+clear Baseline_data Baseline_Segmented i 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% STRUCT BASELINE_SAL IS THE BASELINE DATA FOR LZE DATA NORMALIZATION %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% Import Baseline GBR Data
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select GBR Baseline file','MultiSelect','on');
+data = [PathName File];
+nanimais_GBR=length(File);
+
+%Create a structure based on the parameters defined above
+for i=1:nanimais_GBR
+    Baseline_Data(i)=importdata([PathName File{:,i}]);
+end
+clear File PathName FilterIndex data i
+
+%Loop to create 300
+for i=1:nanimais_GBR
+    Start=1;
+    End=2000;
+    j=2000;
+    for k=1:(Experiment_Time/2) %Where Experiment_Time is the duration of 
+        %the electrophysiological data and 2 is the window determined to windowing
+        
+        %Each line is a 2s window
+        Baseline_Segmented(i).PRL(k,:)=Baseline_Data(i).AD01(Start:End,:);
+        Baseline_Segmented(i).NAC(k,:)=Baseline_Data(i).AD02(Start:End,:);
+        Baseline_Segmented(i).VTA(k,:)=Baseline_Data(i).AD03(Start:End,:);
+        Baseline_Segmented(i).BLA(k,:)=Baseline_Data(i).AD04(Start:End,:);
+        Baseline_Segmented(i).HV(k,:)=Baseline_Data(i).AD05(Start:End,:);
+        Start=Start+j;
+        End=End+j;
+    end
+end
+clear Start End i j k Baseline_Data
+
+for i=1:nanimais_GBR
+        Baseline_GBR(i).PRL=mean(Baseline_Segmented(i).PRL);
+        Baseline_GBR(i).NAC=mean(Baseline_Segmented(i).NAC);
+        Baseline_GBR(i).VTA=mean(Baseline_Segmented(i).VTA);
+        Baseline_GBR(i).BLA=mean(Baseline_Segmented(i).BLA);
+        Baseline_GBR(i).HV=mean(Baseline_Segmented(i).HV);
+end
+clear Baseline_data Baseline_Segmented i 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% STRUCT BASELINE_GBR IS THE BASELINE DATA FOR LZE DATA NORMALIZATION %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%% Import SAL LZE file (number of animals must be the same)
+cd 'C:\Users\Galdino\OneDrive\Mestrado Neuroengenharia\Dissertação\Experimento 2 - Eletrofisiologia\Dados_Atuais\Data_Dissert\LZE_LFP'
+
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select SAL LZE file','MultiSelect','on');
+data = [PathName File];
+
+
+%Create a structure based on the parameters defined above
+for i=1:nanimais_SAL
+    LZE_Data(i)=importdata([PathName File{:,i}]);
+end
+clear File PathName FilterIndex data i
+
