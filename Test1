@@ -9,7 +9,7 @@ Experiment_Time = 600; %600 seconds = 10 minutes
 %% Import Baseline SAL Data
 cd 'C:\Users\Galdino\OneDrive\Mestrado Neuroengenharia\Dissertação\Experimento 2 - Eletrofisiologia\Dados_GV9Jm2u7rmsCe65wKzPTw5jtS38n2tVEGiP'
 
-[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select Baseline file','MultiSelect','on');
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select SAL Baseline file','MultiSelect','on');
 data = [PathName File];
 nanimais_SAL=length(File);
 
@@ -110,7 +110,50 @@ data = [PathName File];
 
 %Create a structure based on the parameters defined above
 for i=1:nanimais_SAL
-    LZE_Data(i)=importdata([PathName File{:,i}]);
+    LZE_SAL(i)=importdata([PathName File{:,i}]);
 end
 clear File PathName FilterIndex data i
+
+%% Import GBR LZE file (number of animals must be the same)
+
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select GBR LZE file','MultiSelect','on');
+data = [PathName File];
+
+
+%Create a structure based on the parameters defined above
+for i=1:nanimais_SAL
+    LZE_GBR(i)=importdata([PathName File{:,i}]);
+end
+clear File PathName FilterIndex data i
+
+%% Identify Events of LZE_GBR
+
+cd 'C:\Users\Galdino\OneDrive\Mestrado Neuroengenharia\Dissertação\Experimento 2 - Eletrofisiologia\Dados_GV9Jm2u7rmsCe65wKzPTw5jtS38n2tVEGing'
+[File,PathName,FilterIndex] = uigetfile({'*.*','CSV(*.*)'}, 'Selecione o CSV referente ao grupo GBR ','MultiSelect','on');
+data = [PathName File];
+
+FsCSV = 80; %Sampling rate;
+
+cd 'C:\Users\Galdino\Desktop'
+%Create a structure based on the parameters defined above
+for i=1:nanimais_GBR
+    CSV_GBR(i).data=importdata([PathName File{:,i}]);
+    CSV_GBR(i).data=matrixcorrection(CSV_GBR(i).data);
+end
+clear File PathName FilterIndex data i T
+
+
+%% Identify Events of LZE_SAL
+cd 'C:\Users\Galdino\OneDrive\Mestrado Neuroengenharia\Dissertação\Experimento 2 - Eletrofisiologia\Dados_GV9Jm2u7rmsCe65wKzPTw5jtS38n2tVEGing'
+[File,PathName,FilterIndex] = uigetfile({'*.*','CSV(*.*)'}, 'Selecione o CSV referente ao grupo SAL','MultiSelect','on');
+data = [PathName File];
+
+FsCSV = 80; %Sampling rate;
+
+
+%Create a structure based on the parameters defined above
+for i=1:nanimais_SAL
+    CSV_SAL(i).data=importdata([PathName File{:,i}]);
+end
+clear File PathName FilterIndex data i T
 
