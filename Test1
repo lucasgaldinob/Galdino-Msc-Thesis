@@ -7,154 +7,152 @@ Fs = 1000;
 Experiment_Time = 600; %600 seconds = 10 minutes
 cd 'C:\Users\Galdino\OneDrive\Mestrado Neuroengenharia\Dissertação\Experimento 2 - Eletrofisiologia\Analise_Mania_Eletrofisio'
 
-% %% Import Baseline SAL Data
-% cd ./Baseline_SAL
-% [File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select SAL Baseline file','MultiSelect','on');
-% data = [PathName File];
-% nanimais_SAL=length(File);
-% 
-% %Create a structure based on the parameters defined above
-% for i=1:nanimais_SAL
-%     Baseline_Data(i)=importdata([PathName File{:,i}]);
-% end
-% clear File PathName FilterIndex data i
-% 
-% 
-% 
-% 
-% %Loop to create 300 windows containing 2s data
-% for i=1:nanimais_SAL
-%     Start=1;
-%     End=2000;
-%     j=2000;
-%     for k=1:(Experiment_Time/2) %Where Experiment_Time is the duration of 
-%         %the electrophysiological data and 2 is the window determined to windowing
-%         %Each line is a 2s window
-%         Baseline_Segmented(i).PRL(k,:)=Baseline_Data(i).AD01(Start:End,:);
-%         Baseline_Segmented(i).NAC(k,:)=Baseline_Data(i).AD02(Start:End,:);
-%         Baseline_Segmented(i).VTA(k,:)=Baseline_Data(i).AD03(Start:End,:);
-%         Baseline_Segmented(i).BLA(k,:)=Baseline_Data(i).AD04(Start:End,:);
-%         Baseline_Segmented(i).HV(k,:)=Baseline_Data(i).AD05(Start:End,:);
-%         Start=Start+j;
-%         End=End+j;
-%     end
-% end
-% clear Start End i j k 
-% 
-% for i=1:nanimais_SAL
-%     for j=1:(Experiment_Time/2)
-%         if max((Baseline_Segmented(i).PRL(j,:)) <= (1.4*std(Baseline_Data(i).AD01)))  
-%             Baseline_Seg(i).PRL(j,:)=Baseline_Segmented(i).PRL(j,:);
-%         end
-%         if max((Baseline_Segmented(i).NAC(j,:)) <= (1.4*std(Baseline_Data(i).AD02)))  
-%             Baseline_Seg(i).NAC(j,:)=Baseline_Segmented(i).NAC(j,:);
-%         end
-%         if max((Baseline_Segmented(i).VTA(j,:)) <= (1.4*std(Baseline_Data(i).AD03)))  
-%             Baseline_Seg(i).VTA(j,:)=Baseline_Segmented(i).VTA(j,:);
-%         end  
-%         if max((Baseline_Segmented(i).BLA(j,:)) <= (1.4*std(Baseline_Data(i).AD04)))  
-%             Baseline_Seg(i).BLA(j,:)=Baseline_Segmented(i).BLA(j,:);
-%         end  
-%         if max((Baseline_Segmented(i).HV(j,:)) <= (1.4*std(Baseline_Data(i).AD05)))  
-%             Baseline_Seg(i).VH(j,:)=Baseline_Segmented(i).HV(j,:); 
-%         else
-%             j=j+1;
-%         end
-%             
-%     end
-% end
-% 
-% 
-% for i=1:nanimais_SAL
-%     for j=1:300
-%         Baseline_SAL(i).PRL=mean(Baseline_Seg(i).PRL);
-%         Baseline_SAL(i).NAC=mean(Baseline_Seg(i).NAC);
-%         Baseline_SAL(i).VTA=mean(Baseline_Seg(i).VTA);
-%         Baseline_SAL(i).BLA=mean(Baseline_Seg(i).BLA);
-%         Baseline_SAL(i).HV=mean(Baseline_Seg(i).VH);
-%     end
-% end
-% clear Baseline_Data Baseline_Segmented Baseline_Seg i 
-% 
-% 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%% STRUCT BASELINE_SAL IS THE BASELINE DATA FOR LZE DATA NORMALIZATION %%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% cd ..
-% 
-% %% Import Baseline GBR Data
-% 
-% cd ./Baseline_GBR
-% [File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select GBR Baseline file','MultiSelect','on');
-% data = [PathName File];
-% nanimais_GBR=length(File);
-% 
-% %Create a structure based on the parameters defined above
-% for i=1:nanimais_GBR
-%     Baseline_Data(i)=importdata([PathName File{:,i}]);
-% end
-% clear File PathName FilterIndex data i
-% 
-% %Loop to create 300
-% for i=1:nanimais_GBR
-%     Start=1;
-%     End=2000;
-%     j=2000;
-%     for k=1:(Experiment_Time/2) %Where Experiment_Time is the duration of 
-%         %the electrophysiological data and 2 is the window determined to windowing
-%         
-%         %Each line is a 2s window
-%         Baseline_Segmented(i).PRL(k,:)=Baseline_Data(i).AD01(Start:End,:);
-%         Baseline_Segmented(i).NAC(k,:)=Baseline_Data(i).AD02(Start:End,:);
-%         Baseline_Segmented(i).VTA(k,:)=Baseline_Data(i).AD03(Start:End,:);
-%         Baseline_Segmented(i).BLA(k,:)=Baseline_Data(i).AD04(Start:End,:);
-%         Baseline_Segmented(i).HV(k,:)=Baseline_Data(i).AD05(Start:End,:);
-%         Start=Start+j;
-%         End=End+j;
-%     end
-% end
-% clear Start End i j k 
-% 
-% 
-% for i=1:nanimais_GBR
-%     for j=1:(Experiment_Time/2)
-%         if max((Baseline_Segmented(i).PRL(j,:)) <= (1.4*std(Baseline_Data(i).AD01)))  
-%             Baseline_Seg(i).PRL(j,:)=Baseline_Segmented(i).PRL(j,:);
-%         end
-%         if max((Baseline_Segmented(i).NAC(j,:)) <= (1.4*std(Baseline_Data(i).AD02)))  
-%             Baseline_Seg(i).NAC(j,:)=Baseline_Segmented(i).NAC(j,:);
-%         end
-%         if max((Baseline_Segmented(i).VTA(j,:)) <= (1.4*std(Baseline_Data(i).AD03)))  
-%             Baseline_Seg(i).VTA(j,:)=Baseline_Segmented(i).VTA(j,:);
-%         end  
-%         if max((Baseline_Segmented(i).BLA(j,:)) <= (1.4*std(Baseline_Data(i).AD04)))  
-%             Baseline_Seg(i).BLA(j,:)=Baseline_Segmented(i).BLA(j,:);
-%         end  
-%         if max((Baseline_Segmented(i).HV(j,:)) <= (1.4*std(Baseline_Data(i).AD05)))  
-%             Baseline_Seg(i).VH(j,:)=Baseline_Segmented(i).HV(j,:); 
-%         else
-%             j=j+1;
-%         end
-%             
-%     end
-% end
-% 
-% 
-% for i=1:nanimais_GBR
-%         Baseline_GBR(i).PRL=mean(Baseline_Seg(i).PRL);
-%         Baseline_GBR(i).NAC=mean(Baseline_Seg(i).NAC);
-%         Baseline_GBR(i).VTA=mean(Baseline_Seg(i).VTA);
-%         Baseline_GBR(i).BLA=mean(Baseline_Seg(i).BLA);
-%         Baseline_GBR(i).HV=mean(Baseline_Seg(i).VH);
-% end
-% clear Baseline_Data Baseline_Segmented Baseline_Seg i 
-% 
-% 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%% STRUCT BASELINE_GBR IS THE BASELINE DATA FOR LZE DATA NORMALIZATION %%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-% cd ..
+%% Import Baseline SAL Data
+cd ./Baseline_SAL
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select SAL Baseline file','MultiSelect','on');
+data = [PathName File];
+nanimais_SAL=length(File);
+
+%Create a structure based on the parameters defined above
+for i=1:nanimais_SAL
+    Baseline_Data(i)=importdata([PathName File{:,i}]);
+end
+clear File PathName FilterIndex data i
+
+
+%Loop to create 300 windows containing 2s data
+for i=1:nanimais_SAL
+    Start=1;
+    End=2000;
+    j=2000;
+    for k=1:(Experiment_Time/2) %Where Experiment_Time is the duration of 
+        %the electrophysiological data and 2 is the window determined to windowing
+        %Each line is a 2s window
+        Baseline_Segmented(i).PRL(k,:)=Baseline_Data(i).AD01(Start:End,:);
+        Baseline_Segmented(i).NAC(k,:)=Baseline_Data(i).AD02(Start:End,:);
+        Baseline_Segmented(i).VTA(k,:)=Baseline_Data(i).AD03(Start:End,:);
+        Baseline_Segmented(i).BLA(k,:)=Baseline_Data(i).AD04(Start:End,:);
+        Baseline_Segmented(i).HV(k,:)=Baseline_Data(i).AD05(Start:End,:);
+        Start=Start+j;
+        End=End+j;
+    end
+end
+clear Start End i j k 
+
+for i=1:nanimais_SAL
+    for j=1:(Experiment_Time/2)
+        if max((Baseline_Segmented(i).PRL(j,:)) <= (1.4*std(Baseline_Data(i).AD01)))  
+            Baseline_Seg(i).PRL(j,:)=Baseline_Segmented(i).PRL(j,:);
+        end
+        if max((Baseline_Segmented(i).NAC(j,:)) <= (1.4*std(Baseline_Data(i).AD02)))  
+            Baseline_Seg(i).NAC(j,:)=Baseline_Segmented(i).NAC(j,:);
+        end
+        if max((Baseline_Segmented(i).VTA(j,:)) <= (1.4*std(Baseline_Data(i).AD03)))  
+            Baseline_Seg(i).VTA(j,:)=Baseline_Segmented(i).VTA(j,:);
+        end  
+        if max((Baseline_Segmented(i).BLA(j,:)) <= (1.4*std(Baseline_Data(i).AD04)))  
+            Baseline_Seg(i).BLA(j,:)=Baseline_Segmented(i).BLA(j,:);
+        end  
+        if max((Baseline_Segmented(i).HV(j,:)) <= (1.4*std(Baseline_Data(i).AD05)))  
+            Baseline_Seg(i).VH(j,:)=Baseline_Segmented(i).HV(j,:); 
+        else
+            j=j+1;
+        end
+            
+    end
+end
+
+
+for i=1:nanimais_SAL
+    for j=1:300
+        Baseline_SAL(i).PRL=mean(Baseline_Seg(i).PRL);
+        Baseline_SAL(i).NAC=mean(Baseline_Seg(i).NAC);
+        Baseline_SAL(i).VTA=mean(Baseline_Seg(i).VTA);
+        Baseline_SAL(i).BLA=mean(Baseline_Seg(i).BLA);
+        Baseline_SAL(i).HV=mean(Baseline_Seg(i).VH);
+    end
+end
+clear Baseline_Data Baseline_Segmented Baseline_Seg i 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% STRUCT BASELINE_SAL IS THE BASELINE DATA FOR LZE DATA NORMALIZATION %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+cd ..
+
+%% Import Baseline GBR Data
+
+cd ./Baseline_GBR
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select GBR Baseline file','MultiSelect','on');
+data = [PathName File];
+nanimais_GBR=length(File);
+
+%Create a structure based on the parameters defined above
+for i=1:nanimais_GBR
+    Baseline_Data(i)=importdata([PathName File{:,i}]);
+end
+clear File PathName FilterIndex data i
+
+%Loop to create 300
+for i=1:nanimais_GBR
+    Start=1;
+    End=2000;
+    j=2000;
+    for k=1:(Experiment_Time/2) %Where Experiment_Time is the duration of 
+        %the electrophysiological data and 2 is the window determined to windowing
+        
+        %Each line is a 2s window
+        Baseline_Segmented(i).PRL(k,:)=Baseline_Data(i).AD01(Start:End,:);
+        Baseline_Segmented(i).NAC(k,:)=Baseline_Data(i).AD02(Start:End,:);
+        Baseline_Segmented(i).VTA(k,:)=Baseline_Data(i).AD03(Start:End,:);
+        Baseline_Segmented(i).BLA(k,:)=Baseline_Data(i).AD04(Start:End,:);
+        Baseline_Segmented(i).HV(k,:)=Baseline_Data(i).AD05(Start:End,:);
+        Start=Start+j;
+        End=End+j;
+    end
+end
+clear Start End i j k 
+
+
+for i=1:nanimais_GBR
+    for j=1:(Experiment_Time/2)
+        if max((Baseline_Segmented(i).PRL(j,:)) <= (1.4*std(Baseline_Data(i).AD01)))  
+            Baseline_Seg(i).PRL(j,:)=Baseline_Segmented(i).PRL(j,:);
+        end
+        if max((Baseline_Segmented(i).NAC(j,:)) <= (1.4*std(Baseline_Data(i).AD02)))  
+            Baseline_Seg(i).NAC(j,:)=Baseline_Segmented(i).NAC(j,:);
+        end
+        if max((Baseline_Segmented(i).VTA(j,:)) <= (1.4*std(Baseline_Data(i).AD03)))  
+            Baseline_Seg(i).VTA(j,:)=Baseline_Segmented(i).VTA(j,:);
+        end  
+        if max((Baseline_Segmented(i).BLA(j,:)) <= (1.4*std(Baseline_Data(i).AD04)))  
+            Baseline_Seg(i).BLA(j,:)=Baseline_Segmented(i).BLA(j,:);
+        end  
+        if max((Baseline_Segmented(i).HV(j,:)) <= (1.4*std(Baseline_Data(i).AD05)))  
+            Baseline_Seg(i).VH(j,:)=Baseline_Segmented(i).HV(j,:); 
+        else
+            j=j+1;
+        end
+            
+    end
+end
+
+
+for i=1:nanimais_GBR
+        Baseline_GBR(i).PRL=mean(Baseline_Seg(i).PRL);
+        Baseline_GBR(i).NAC=mean(Baseline_Seg(i).NAC);
+        Baseline_GBR(i).VTA=mean(Baseline_Seg(i).VTA);
+        Baseline_GBR(i).BLA=mean(Baseline_Seg(i).BLA);
+        Baseline_GBR(i).HV=mean(Baseline_Seg(i).VH);
+end
+clear Baseline_Data Baseline_Segmented Baseline_Seg i 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% STRUCT BASELINE_GBR IS THE BASELINE DATA FOR LZE DATA NORMALIZATION %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+cd ..
 % 
 %% Import SAL LZE file (number of animals must be the same)
 cd ./LZE_SAL
@@ -164,7 +162,7 @@ data = [PathName File];
 
 %Create a structure based on the parameters defined above
 for i=1:nanimais_SAL
-    LZE_SAL(i)=importdata([PathName File{:,i}]);
+    LFP_LZE_SAL(i)=importdata([PathName File{:,i}]);
 end
 clear File PathName FilterIndex data i
 
@@ -176,7 +174,7 @@ data = [PathName File];
 
 %Create a structure based on the parameters defined above
 for i=1:nanimais_SAL
-    LZE_GBR(i)=importdata([PathName File{:,i}]);
+    LFP_LZE_GBR(i)=importdata([PathName File{:,i}]);
 end
 clear File PathName FilterIndex data i
 
@@ -218,5 +216,23 @@ clear File PathName FilterIndex data i T CSV_GBR
 
 %% Windowing LFP signal of SAL
 
-
+for z=1:nanimais_GBR
+Ev=[];
+    for i=1:size(Events_GBR_CA(z).data,1)
+        Ev(i,:)=floor(Events_GBR_CA(z).data(i,:));
+    end
     
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_GBR(z).AD01(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LZE_GBR_CA_Final{z,1}=LFPjanelaAll;
+end
