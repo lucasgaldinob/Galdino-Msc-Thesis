@@ -153,12 +153,13 @@ clear Baseline_Data Baseline_Segmented Baseline_Seg i
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cd ..
+% load 'Baseline_Data.mat';
 % 
 %% Import SAL LZE file (number of animals must be the same)
 cd ./LZE_SAL
 [File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select SAL LZE file','MultiSelect','on');
 data = [PathName File];
-
+nanimais_SAL=length(File);
 
 %Create a structure based on the parameters defined above
 for i=1:nanimais_SAL
@@ -170,7 +171,7 @@ clear File PathName FilterIndex data i
 cd 'C:\Users\Galdino\OneDrive\Mestrado Neuroengenharia\Dissertação\Experimento 2 - Eletrofisiologia\Analise_Mania_Eletrofisio\LZE_GBR'
 [File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select GBR LZE file','MultiSelect','on');
 data = [PathName File];
-
+nanimais_GBR=length(File);
 
 %Create a structure based on the parameters defined above
 for i=1:nanimais_SAL
@@ -180,7 +181,7 @@ clear File PathName FilterIndex data i
 
 cd ..
 
-load 'Baseline_Data.mat';
+
 %% Identify Events of LZE_SAL
 cd ./CSV_SAL
 [File,PathName,FilterIndex] = uigetfile({'*.*','CSV(*.*)'}, 'Selecione o CSV referente ao grupo SAL','MultiSelect','on');
@@ -214,25 +215,74 @@ for i=1:nanimais_GBR
 end
 clear File PathName FilterIndex data i T CSV_GBR
 
-%% Windowing LFP signal of SAL
+%% Windowing the signal
 
-for z=1:nanimais_GBR
-Ev=[];
-    for i=1:size(Events_GBR_CA(z).data,1)
-        Ev(i,:)=floor(Events_GBR_CA(z).data(i,:));
+run LFP_Segmentation.m
+clear Baseline_GBR Baseline_SAL i z init j last LFPjanela LFPjanelaAll Ev Events_GBR_CA Events_GBR_OA Events_SAL_CA Events_SAL_OA LFP_LZE_SAL LFP_LZE_GBR
+
+
+%% Cat all LFP segments
+LFP_AllWind_GBR_CA = cellfun(@cell2mat,num2cell(LFP_WIND_GBR_CA,1),'un',0);
+LFP_AllWind_GBR_OA = cellfun(@cell2mat,num2cell(LFP_WIND_GBR_OA,1),'un',0);
+LFP_AllWind_SAL_CA = cellfun(@cell2mat,num2cell(LFP_WIND_SAL_CA,1),'un',0);
+LFP_AllWind_SAL_OA = cellfun(@cell2mat,num2cell(LFP_WIND_SAL_OA,1),'un',0);
+
+%% Power Spectrum Density 
+
+% FFT Parameters
+WINDOW=2000; %Window length
+Fs=1000; %Sampling rate
+NFFT=Fs*2; %NFFT is the number of points in a window (2s = 1000 NFFT) // no zero padding
+
+%GBR Closed Arm
+clear Pxx F  j i 
+for i=1:size(LFP_AllWind_GBR_CA,2)
+    Pxx=[];
+    for j=1:(size(LFP_AllWind_GBR_CA{1, 1},1))
+        [Pxx F] = pwelch(LFP_AllWind_GBR_CA{1, i}(j,:),WINDOW,[],NFFT,Fs);
+        PSD_ALLWind_GBR_CA{1,i}(j,:)=Pxx;
     end
-    
-    LFPjanelaAll=[];
-    for j=1:size(Ev,1)
-        init=Ev(j,1);
-        LFPjanela=[];
-        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
-            last=init+1999;
-            LFPjanela(i,:)=LFP_LZE_GBR(z).AD01(init:last);
-            init=last;
-        end
-        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
-        
-    end
-    LZE_GBR_CA_Final{z,1}=LFPjanelaAll;
 end
+
+
+%GBR Open Arm
+clear Pxx F j i 
+for i=1:size(LFP_AllWind_GBR_OA,2)
+    Pxx=[];
+    for j=1:(size(LFP_AllWind_GBR_OA{1, 1},1))
+        [Pxx F] = pwelch(LFP_AllWind_GBR_OA{1, i}(j,:),WINDOW,[],NFFT,Fs);
+        PSD_ALLWind_GBR_OA{1,i}(j,:)=Pxx;
+    end
+end
+
+
+%SAL Closed Arm
+clear Pxx F j i
+for i=1:size(LFP_AllWind_SAL_CA,2)
+    Pxx=[];
+    for j=1:(size(LFP_AllWind_SAL_CA{1, 1},1))
+        [Pxx F] = pwelch(LFP_AllWind_SAL_CA{1, i}(j,:),WINDOW,[],NFFT,Fs);
+        PSD_ALLWind_SAL_CA{1,i}(j,:)=Pxx;
+    end
+end
+
+
+%SAL Open Arm
+clear Pxx F j i
+for i=1:size(LFP_AllWind_SAL_OA,2)
+    Pxx=[];
+    for j=1:(size(LFP_AllWind_SAL_OA{1, 1},1))
+        [Pxx F] = pwelch(LFP_AllWind_SAL_OA{1, i}(j,:),WINDOW,[],NFFT,Fs);
+        PSD_ALLWind_SAL_OA{1,i}(j,:)=Pxx;
+    end
+end
+
+%% Computing the PSD for each bandwidth 
+
+%Bandwidth frequencies parameters:
+% Delta - 1~4 Hz
+% Theta - 4~11 Hz
+% Beta - 15~25 Hz
+
+
+
