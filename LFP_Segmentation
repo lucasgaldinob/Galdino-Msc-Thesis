@@ -1,0 +1,457 @@
+%% GBR Open Arm Segments
+
+%Prelimbic Cortex
+for z=1:nanimais_GBR
+Ev=[];
+    for i=1:size(Events_GBR_OA(z).data,1)
+        Ev(i,:)=floor(Events_GBR_OA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for k=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(k,:)=LFP_LZE_GBR(z).AD01(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_GBR_OA{z,1}=LFPjanelaAll;
+end
+
+%Nucleo Accumbens
+for z=1:nanimais_GBR
+Ev=[];
+    for i=1:size(Events_GBR_OA(z).data,1)
+        Ev(i,:)=floor(Events_GBR_OA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_GBR(z).AD02(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_GBR_OA{z,2}=LFPjanelaAll;
+end
+
+%Ventral Tegmental Area
+for z=1:nanimais_GBR
+Ev=[];
+    for i=1:size(Events_GBR_OA(z).data,1)
+        Ev(i,:)=floor(Events_GBR_OA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_GBR(z).AD03(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_GBR_OA{z,3}=LFPjanelaAll;
+end
+
+%Basolateral Amygdala
+for z=1:nanimais_GBR
+Ev=[];
+    for i=1:size(Events_GBR_OA(z).data,1)
+        Ev(i,:)=floor(Events_GBR_OA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_GBR(z).AD04(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_GBR_OA{z,4}=LFPjanelaAll;
+end
+
+%VENTRAL HIPPOCAMPUS
+for z=1:nanimais_GBR
+Ev=[];
+    for i=1:size(Events_GBR_OA(z).data,1)
+        Ev(i,:)=floor(Events_GBR_OA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_GBR(z).AD05(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_GBR_OA{z,5}=LFPjanelaAll;
+end
+
+
+%% GBR Closed Arm Segments
+
+%Prelimbic Cortex
+for z=1:nanimais_GBR
+Ev=[];
+    for i=1:size(Events_GBR_CA(z).data,1)
+        Ev(i,:)=floor(Events_GBR_CA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_GBR(z).AD01(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_GBR_CA{z,1}=LFPjanelaAll;
+end
+
+%Nucleo Accumbens
+for z=1:nanimais_GBR
+Ev=[];
+    for i=1:size(Events_GBR_CA(z).data,1)
+        Ev(i,:)=floor(Events_GBR_CA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_GBR(z).AD02(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_GBR_CA{z,2}=LFPjanelaAll;
+end
+
+%Ventral Tegmental Area
+for z=1:nanimais_GBR
+Ev=[];
+    for i=1:size(Events_GBR_CA(z).data,1)
+        Ev(i,:)=floor(Events_GBR_CA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_GBR(z).AD03(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_GBR_CA{z,3}=LFPjanelaAll;
+end
+
+%Basolateral Amygdala
+for z=1:nanimais_GBR
+Ev=[];
+    for i=1:size(Events_GBR_CA(z).data,1)
+        Ev(i,:)=floor(Events_GBR_CA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_GBR(z).AD04(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_GBR_CA{z,4}=LFPjanelaAll;
+end
+
+
+
+%VENTRAL HIPPOCAMPUS
+for z=1:nanimais_GBR
+Ev=[];
+    for i=1:size(Events_GBR_CA(z).data,1)
+        Ev(i,:)=floor(Events_GBR_CA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_GBR(z).AD05(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_GBR_CA{z,5}=LFPjanelaAll;
+end
+
+%% SAL Open Arm Segments
+
+%Prelimbic Cortex
+for z=1:nanimais_SAL
+Ev=[];
+    for i=1:size(Events_SAL_OA(z).data,1)
+        Ev(i,:)=floor(Events_SAL_OA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_SAL(z).AD01(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_SAL_OA{z,1}=LFPjanelaAll;
+end
+
+%Nucleo Accumbens
+for z=1:nanimais_SAL
+Ev=[];
+    for i=1:size(Events_SAL_OA(z).data,1)
+        Ev(i,:)=floor(Events_SAL_OA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_SAL(z).AD02(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_SAL_OA{z,2}=LFPjanelaAll;
+end
+
+%Ventral Tegmental Area
+for z=1:nanimais_SAL
+Ev=[];
+    for i=1:size(Events_SAL_OA(z).data,1)
+        Ev(i,:)=floor(Events_SAL_OA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_SAL(z).AD03(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_SAL_OA{z,3}=LFPjanelaAll;
+end
+
+%Basolateral Amygdala
+for z=1:nanimais_SAL
+Ev=[];
+    for i=1:size(Events_SAL_OA(z).data,1)
+        Ev(i,:)=floor(Events_SAL_OA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_SAL(z).AD04(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_SAL_OA{z,4}=LFPjanelaAll;
+end
+
+
+
+%VENTRAL HIPPOCAMPUS
+for z=1:nanimais_SAL
+Ev=[];
+    for i=1:size(Events_SAL_OA(z).data,1)
+        Ev(i,:)=floor(Events_SAL_OA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_SAL(z).AD05(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_SAL_OA{z,5}=LFPjanelaAll;
+end
+
+
+%% SAL Closed Arm Segments
+
+%Prelimbic Cortex
+for z=1:nanimais_SAL
+Ev=[];
+    for i=1:size(Events_SAL_CA(z).data,1)
+        Ev(i,:)=floor(Events_SAL_CA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_SAL(z).AD01(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_SAL_CA{z,1}=LFPjanelaAll;
+end
+
+%Nucleo Accumbens
+for z=1:nanimais_SAL
+Ev=[];
+    for i=1:size(Events_SAL_CA(z).data,1)
+        Ev(i,:)=floor(Events_SAL_CA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_SAL(z).AD02(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_SAL_CA{z,2}=LFPjanelaAll;
+end
+
+%Ventral Tegmental Area
+for z=1:nanimais_SAL
+Ev=[];
+    for i=1:size(Events_SAL_CA(z).data,1)
+        Ev(i,:)=floor(Events_SAL_CA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_SAL(z).AD03(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_SAL_CA{z,3}=LFPjanelaAll;
+end
+
+%Basolateral Amygdala
+for z=1:nanimais_SAL
+Ev=[];
+    for i=1:size(Events_SAL_CA(z).data,1)
+        Ev(i,:)=floor(Events_SAL_CA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_SAL(z).AD04(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_SAL_CA{z,4}=LFPjanelaAll;
+end
+
+
+
+%VENTRAL HIPPOCAMPUS
+for z=1:nanimais_SAL
+Ev=[];
+    for i=1:size(Events_SAL_CA(z).data,1)
+        Ev(i,:)=floor(Events_SAL_CA(z).data(i,:));
+    end
+    
+    LFPjanelaAll=[];
+    for j=1:size(Ev,1)
+        init=Ev(j,1);
+        LFPjanela=[];
+        for i=1:floor(((Ev(j,2)-Ev(j,1))/2000))
+            last=init+1999;
+            LFPjanela(i,:)=LFP_LZE_SAL(z).AD05(init:last);
+            init=last;
+        end
+        LFPjanelaAll=[LFPjanelaAll;LFPjanela];
+        
+    end
+    LFP_WIND_SAL_CA{z,5}=LFPjanelaAll;
+end
+
+
