@@ -177,14 +177,15 @@ for i=1:nanimais_SAL
 end
 clear File PathName FilterIndex data i
 
+cd ..
 %% Import GBR LZE file (number of animals must be the same)
-cd 'C:\Users\Galdino\OneDrive\Mestrado Neuroengenharia\Dissertação\Experimento 2 - Eletrofisiologia\Analise_Mania_Eletrofisio\LZE_GBR'
+cd ./LZE_GBR
 [File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select GBR LZE file','MultiSelect','on');
 data = [PathName File];
 nanimais_GBR=length(File);
 
 %Create a structure based on the parameters defined above
-for i=1:nanimais_SAL
+for i=1:nanimais_GBR
     LFP_LZE_GBR(i)=importdata([PathName File{:,i}]);
 end
 clear File PathName FilterIndex data i
@@ -277,9 +278,9 @@ end
 clear i j pxx 
 for i=1:nanimais_SAL
     Pxx=[];
-    for j=1:size(LFP_WIND_SAL_OA,2)
+    for j=1:(size(LFP_WIND_SAL_OA,2))
         Pxx=[];
-        for z=1:size(LFP_WIND_SAL_OA{i, j},1) 
+        for z=1:size(LFP_WIND_SAL_OA{i, j},1)
             [Pxx F] = pwelch(LFP_WIND_SAL_OA{i, j}(z,:),WINDOW,[],NFFT,Fs);
             PSD_WIND_SAL_OA{i, j}(z,:)=Pxx;
         end
@@ -287,9 +288,9 @@ for i=1:nanimais_SAL
     end
 end
 
-if PSD_WIND_SAL_OA{1,1}==[]
-    PSD_WIND_SAL_OA{1,:}=[];
-end
+
+
+
 
 %% Cat all LFP segments
 PSD_AllWind_GBR_CA = cellfun(@cell2mat,num2cell(PSD_WIND_GBR_CA,1),'un',0);
@@ -299,6 +300,8 @@ PSD_AllWind_SAL_OA = cellfun(@cell2mat,num2cell(PSD_WIND_SAL_OA,1),'un',0);
 
 %% Computing the PSD for each bandwidth 
 
+clear
+load ('PSD_All_Wind.mat');
 %Bandwidth frequencies parameters:
 % Delta - 1~4 Hz
 % Theta - 4~11 Hz
@@ -314,77 +317,77 @@ LowGamma = (F>=30 & F<=55);
 HighGamma = (F>=70 & F<=100);
 
 %PSD GBR CLOSED ARM PER BANDWIDTH
-for i=1:size(PSD_ALLWind_GBR_CA,2)
-    for j=1:size(PSD_ALLWind_GBR_CA{1, 1},1)
-        PSD_GBR_CA.Delta(j,i)=trapz(PSD_ALLWind_GBR_CA{1,i}(j,Delta),2);
-        PSD_GBR_CA.Theta(j,i)=trapz(PSD_ALLWind_GBR_CA{1,i}(j,Theta),2);
-        PSD_GBR_CA.Beta(j,i)=trapz(PSD_ALLWind_GBR_CA{1,i}(j,Beta),2);
-        PSD_GBR_CA.LowGamma(j,i)=trapz(PSD_ALLWind_GBR_CA{1,i}(j,LowGamma),2);
-        PSD_GBR_CA.HighGamma(j,i)=trapz(PSD_ALLWind_GBR_CA{1,i}(j,HighGamma),2);
+for i=1:size(PSD_AllWind_GBR_CA,2)
+    for j=1:size(PSD_AllWind_GBR_CA{1, 1},1)
+        PSD_GBR_CA.Delta(j,i)=trapz(PSD_AllWind_GBR_CA{1,i}(j,Delta),2);
+        PSD_GBR_CA.Theta(j,i)=trapz(PSD_AllWind_GBR_CA{1,i}(j,Theta),2);
+        PSD_GBR_CA.Beta(j,i)=trapz(PSD_AllWind_GBR_CA{1,i}(j,Beta),2);
+        PSD_GBR_CA.LowGamma(j,i)=trapz(PSD_AllWind_GBR_CA{1,i}(j,LowGamma),2);
+        PSD_GBR_CA.HighGamma(j,i)=trapz(PSD_AllWind_GBR_CA{1,i}(j,HighGamma),2);
     end
 end
 
 %% PSD GBR OPEN ARM 
-for i=1:size(PSD_ALLWind_GBR_OA,2)
-    for j=1:size(PSD_ALLWind_GBR_OA{1, 1},1)
-        PSD_GBR_OA.Delta(j,i)=trapz(PSD_ALLWind_GBR_OA{1,i}(j,Delta),2);
-        PSD_GBR_OA.Theta(j,i)=trapz(PSD_ALLWind_GBR_OA{1,i}(j,Theta),2);
-        PSD_GBR_OA.Beta(j,i)=trapz(PSD_ALLWind_GBR_OA{1,i}(j,Beta),2);
-        PSD_GBR_OA.LowGamma(j,i)=trapz(PSD_ALLWind_GBR_OA{1,i}(j,LowGamma),2);
-        PSD_GBR_OA.HighGamma(j,i)=trapz(PSD_ALLWind_GBR_OA{1,i}(j,HighGamma),2);
+for i=1:size(PSD_AllWind_GBR_OA,2)
+    for j=1:size(PSD_AllWind_GBR_OA{1, 1},1)
+        PSD_GBR_OA.Delta(j,i)=trapz(PSD_AllWind_GBR_OA{1,i}(j,Delta),2);
+        PSD_GBR_OA.Theta(j,i)=trapz(PSD_AllWind_GBR_OA{1,i}(j,Theta),2);
+        PSD_GBR_OA.Beta(j,i)=trapz(PSD_AllWind_GBR_OA{1,i}(j,Beta),2);
+        PSD_GBR_OA.LowGamma(j,i)=trapz(PSD_AllWind_GBR_OA{1,i}(j,LowGamma),2);
+        PSD_GBR_OA.HighGamma(j,i)=trapz(PSD_AllWind_GBR_OA{1,i}(j,HighGamma),2);
     end
 end
 
 %PSD SAL CLOSED ARM PER BANDWIDTH
-for i=1:size(PSD_ALLWind_SAL_CA,2)
-    for j=1:size(PSD_ALLWind_SAL_CA{1, 1},1)
-        PSD_SAL_CA.Delta(j,i)=trapz(PSD_ALLWind_SAL_CA{1,i}(j,Delta),2);
-        PSD_SAL_CA.Theta(j,i)=trapz(PSD_ALLWind_SAL_CA{1,i}(j,Theta),2);
-        PSD_SAL_CA.Beta(j,i)=trapz(PSD_ALLWind_SAL_CA{1,i}(j,Beta),2);
-        PSD_SAL_CA.LowGamma(j,i)=trapz(PSD_ALLWind_SAL_CA{1,i}(j,LowGamma),2);
-        PSD_SAL_CA.HighGamma(j,i)=trapz(PSD_ALLWind_SAL_CA{1,i}(j,HighGamma),2);
+for i=1:size(PSD_AllWind_SAL_CA,2)
+    for j=1:size(PSD_AllWind_SAL_CA{1, 1},1)
+        PSD_SAL_CA.Delta(j,i)=trapz(PSD_AllWind_SAL_CA{1,i}(j,Delta),2);
+        PSD_SAL_CA.Theta(j,i)=trapz(PSD_AllWind_SAL_CA{1,i}(j,Theta),2);
+        PSD_SAL_CA.Beta(j,i)=trapz(PSD_AllWind_SAL_CA{1,i}(j,Beta),2);
+        PSD_SAL_CA.LowGamma(j,i)=trapz(PSD_AllWind_SAL_CA{1,i}(j,LowGamma),2);
+        PSD_SAL_CA.HighGamma(j,i)=trapz(PSD_AllWind_SAL_CA{1,i}(j,HighGamma),2);
     end
 end
 
 %% PSD SAL OPEN ARM 
-for i=1:size(PSD_ALLWind_SAL_OA,2)
-    for j=1:size(PSD_ALLWind_SAL_OA{1, 1},1)
-        PSD_SAL_OA.Delta(j,i)=trapz(PSD_ALLWind_SAL_OA{1,i}(j,Delta),2);
-        PSD_SAL_OA.Theta(j,i)=trapz(PSD_ALLWind_SAL_OA{1,i}(j,Theta),2);
-        PSD_SAL_OA.Beta(j,i)=trapz(PSD_ALLWind_SAL_OA{1,i}(j,Beta),2);
-        PSD_SAL_OA.LowGamma(j,i)=trapz(PSD_ALLWind_SAL_OA{1,i}(j,LowGamma),2);
-        PSD_SAL_OA.HighGamma(j,i)=trapz(PSD_ALLWind_SAL_OA{1,i}(j,HighGamma),2);
+for i=1:size(PSD_AllWind_SAL_OA,2)
+    for j=1:size(PSD_AllWind_SAL_OA{1, 1},1)
+        PSD_SAL_OA.Delta(j,i)=trapz(PSD_AllWind_SAL_OA{1,i}(j,Delta),2);
+        PSD_SAL_OA.Theta(j,i)=trapz(PSD_AllWind_SAL_OA{1,i}(j,Theta),2);
+        PSD_SAL_OA.Beta(j,i)=trapz(PSD_AllWind_SAL_OA{1,i}(j,Beta),2);
+        PSD_SAL_OA.LowGamma(j,i)=trapz(PSD_AllWind_SAL_OA{1,i}(j,LowGamma),2);
+        PSD_SAL_OA.HighGamma(j,i)=trapz(PSD_AllWind_SAL_OA{1,i}(j,HighGamma),2);
     end
 end
 
 %% Realocating values to export SPSS columns with PSD's
-% %PRL 
-% SPSS.PRL_GBR_CA=[PSD_GBR_CA.Delta(:,1), PSD_GBR_CA.Theta(:,1) PSD_GBR_CA.Beta(:,1), PSD_GBR_CA.LowGamma(:,1), PSD_GBR_CA.HighGamma(:,1)];
-% SPSS.PRL_GBR_OA=[PSD_GBR_OA.Delta(:,1), PSD_GBR_OA.Theta(:,1) PSD_GBR_OA.Beta(:,1), PSD_GBR_OA.LowGamma(:,1), PSD_GBR_OA.HighGamma(:,1)];
-% SPSS.PRL_SAL_CA=[PSD_SAL_CA.Delta(:,1), PSD_SAL_CA.Theta(:,1) PSD_SAL_CA.Beta(:,1), PSD_SAL_CA.LowGamma(:,1), PSD_SAL_CA.HighGamma(:,1)];
-% SPSS.PRL_SAL_OA=[PSD_SAL_OA.Delta(:,1), PSD_SAL_OA.Theta(:,1) PSD_SAL_OA.Beta(:,1), PSD_SAL_OA.LowGamma(:,1), PSD_SAL_OA.HighGamma(:,1)];
-% 
-% %NAC
-% SPSS.NAC_GBR_CA=[PSD_GBR_CA.Delta(:,2), PSD_GBR_CA.Theta(:,2) PSD_GBR_CA.Beta(:,2), PSD_GBR_CA.LowGamma(:,2), PSD_GBR_CA.HighGamma(:,2)];
-% SPSS.NAC_GBR_OA=[PSD_GBR_OA.Delta(:,2), PSD_GBR_OA.Theta(:,2) PSD_GBR_OA.Beta(:,2), PSD_GBR_OA.LowGamma(:,2), PSD_GBR_OA.HighGamma(:,2)];
-% SPSS.NAC_SAL_CA=[PSD_SAL_CA.Delta(:,2), PSD_SAL_CA.Theta(:,2) PSD_SAL_CA.Beta(:,2), PSD_SAL_CA.LowGamma(:,2), PSD_SAL_CA.HighGamma(:,2)];
-% SPSS.NAC_SAL_OA=[PSD_SAL_OA.Delta(:,2), PSD_SAL_OA.Theta(:,2) PSD_SAL_OA.Beta(:,2), PSD_SAL_OA.LowGamma(:,2), PSD_SAL_OA.HighGamma(:,2)];
-% 
-% %VTA
-% SPSS.VTA_GBR_CA=[PSD_GBR_CA.Delta(:,3), PSD_GBR_CA.Theta(:,3) PSD_GBR_CA.Beta(:,3), PSD_GBR_CA.LowGamma(:,3), PSD_GBR_CA.HighGamma(:,3)];
-% SPSS.VTA_GBR_OA=[PSD_GBR_OA.Delta(:,3), PSD_GBR_OA.Theta(:,3) PSD_GBR_OA.Beta(:,3), PSD_GBR_OA.LowGamma(:,3), PSD_GBR_OA.HighGamma(:,3)];
-% SPSS.VTA_SAL_CA=[PSD_SAL_CA.Delta(:,3), PSD_SAL_CA.Theta(:,3) PSD_SAL_CA.Beta(:,3), PSD_SAL_CA.LowGamma(:,3), PSD_SAL_CA.HighGamma(:,3)];
-% SPSS.VTA_SAL_OA=[PSD_SAL_OA.Delta(:,3), PSD_SAL_OA.Theta(:,3) PSD_SAL_OA.Beta(:,3), PSD_SAL_OA.LowGamma(:,3), PSD_SAL_OA.HighGamma(:,3)];
-% 
-% %BLA
-% SPSS.BLA_GBR_CA=[PSD_GBR_CA.Delta(:,4), PSD_GBR_CA.Theta(:,4) PSD_GBR_CA.Beta(:,4), PSD_GBR_CA.LowGamma(:,4), PSD_GBR_CA.HighGamma(:,4)];
-% SPSS.BLA_GBR_OA=[PSD_GBR_OA.Delta(:,4), PSD_GBR_OA.Theta(:,4) PSD_GBR_OA.Beta(:,4), PSD_GBR_OA.LowGamma(:,4), PSD_GBR_OA.HighGamma(:,4)];
-% SPSS.BLA_SAL_CA=[PSD_SAL_CA.Delta(:,4), PSD_SAL_CA.Theta(:,4) PSD_SAL_CA.Beta(:,4), PSD_SAL_CA.LowGamma(:,4), PSD_SAL_CA.HighGamma(:,4)];
-% SPSS.BLA_SAL_OA=[PSD_SAL_OA.Delta(:,4), PSD_SAL_OA.Theta(:,4) PSD_SAL_OA.Beta(:,4), PSD_SAL_OA.LowGamma(:,4), PSD_SAL_OA.HighGamma(:,4)];
-% 
-% %VH
-% SPSS.VH_GBR_CA=[PSD_GBR_CA.Delta(:,5), PSD_GBR_CA.Theta(:,5) PSD_GBR_CA.Beta(:,5), PSD_GBR_CA.LowGamma(:,5), PSD_GBR_CA.HighGamma(:,5)];
-% SPSS.VH_GBR_OA=[PSD_GBR_OA.Delta(:,5), PSD_GBR_OA.Theta(:,5) PSD_GBR_OA.Beta(:,5), PSD_GBR_OA.LowGamma(:,5), PSD_GBR_OA.HighGamma(:,5)];
-% SPSS.VH_SAL_CA=[PSD_SAL_CA.Delta(:,5), PSD_SAL_CA.Theta(:,5) PSD_SAL_CA.Beta(:,5), PSD_SAL_CA.LowGamma(:,5), PSD_SAL_CA.HighGamma(:,5)];
-% SPSS.VH_SAL_OA=[PSD_SAL_OA.Delta(:,5), PSD_SAL_OA.Theta(:,5) PSD_SAL_OA.Beta(:,5), PSD_SAL_OA.LowGamma(:,5), PSD_SAL_OA.HighGamma(:,5)];
+%PRL 
+SPSS.PRL_GBR_CA=[PSD_GBR_CA.Delta(:,1), PSD_GBR_CA.Theta(:,1) PSD_GBR_CA.Beta(:,1), PSD_GBR_CA.LowGamma(:,1), PSD_GBR_CA.HighGamma(:,1)];
+SPSS.PRL_GBR_OA=[PSD_GBR_OA.Delta(:,1), PSD_GBR_OA.Theta(:,1) PSD_GBR_OA.Beta(:,1), PSD_GBR_OA.LowGamma(:,1), PSD_GBR_OA.HighGamma(:,1)];
+SPSS.PRL_SAL_CA=[PSD_SAL_CA.Delta(:,1), PSD_SAL_CA.Theta(:,1) PSD_SAL_CA.Beta(:,1), PSD_SAL_CA.LowGamma(:,1), PSD_SAL_CA.HighGamma(:,1)];
+SPSS.PRL_SAL_OA=[PSD_SAL_OA.Delta(:,1), PSD_SAL_OA.Theta(:,1) PSD_SAL_OA.Beta(:,1), PSD_SAL_OA.LowGamma(:,1), PSD_SAL_OA.HighGamma(:,1)];
+
+%NAC
+SPSS.NAC_GBR_CA=[PSD_GBR_CA.Delta(:,2), PSD_GBR_CA.Theta(:,2) PSD_GBR_CA.Beta(:,2), PSD_GBR_CA.LowGamma(:,2), PSD_GBR_CA.HighGamma(:,2)];
+SPSS.NAC_GBR_OA=[PSD_GBR_OA.Delta(:,2), PSD_GBR_OA.Theta(:,2) PSD_GBR_OA.Beta(:,2), PSD_GBR_OA.LowGamma(:,2), PSD_GBR_OA.HighGamma(:,2)];
+SPSS.NAC_SAL_CA=[PSD_SAL_CA.Delta(:,2), PSD_SAL_CA.Theta(:,2) PSD_SAL_CA.Beta(:,2), PSD_SAL_CA.LowGamma(:,2), PSD_SAL_CA.HighGamma(:,2)];
+SPSS.NAC_SAL_OA=[PSD_SAL_OA.Delta(:,2), PSD_SAL_OA.Theta(:,2) PSD_SAL_OA.Beta(:,2), PSD_SAL_OA.LowGamma(:,2), PSD_SAL_OA.HighGamma(:,2)];
+
+%VTA
+SPSS.VTA_GBR_CA=[PSD_GBR_CA.Delta(:,3), PSD_GBR_CA.Theta(:,3) PSD_GBR_CA.Beta(:,3), PSD_GBR_CA.LowGamma(:,3), PSD_GBR_CA.HighGamma(:,3)];
+SPSS.VTA_GBR_OA=[PSD_GBR_OA.Delta(:,3), PSD_GBR_OA.Theta(:,3) PSD_GBR_OA.Beta(:,3), PSD_GBR_OA.LowGamma(:,3), PSD_GBR_OA.HighGamma(:,3)];
+SPSS.VTA_SAL_CA=[PSD_SAL_CA.Delta(:,3), PSD_SAL_CA.Theta(:,3) PSD_SAL_CA.Beta(:,3), PSD_SAL_CA.LowGamma(:,3), PSD_SAL_CA.HighGamma(:,3)];
+SPSS.VTA_SAL_OA=[PSD_SAL_OA.Delta(:,3), PSD_SAL_OA.Theta(:,3) PSD_SAL_OA.Beta(:,3), PSD_SAL_OA.LowGamma(:,3), PSD_SAL_OA.HighGamma(:,3)];
+
+%BLA
+SPSS.BLA_GBR_CA=[PSD_GBR_CA.Delta(:,4), PSD_GBR_CA.Theta(:,4) PSD_GBR_CA.Beta(:,4), PSD_GBR_CA.LowGamma(:,4), PSD_GBR_CA.HighGamma(:,4)];
+SPSS.BLA_GBR_OA=[PSD_GBR_OA.Delta(:,4), PSD_GBR_OA.Theta(:,4) PSD_GBR_OA.Beta(:,4), PSD_GBR_OA.LowGamma(:,4), PSD_GBR_OA.HighGamma(:,4)];
+SPSS.BLA_SAL_CA=[PSD_SAL_CA.Delta(:,4), PSD_SAL_CA.Theta(:,4) PSD_SAL_CA.Beta(:,4), PSD_SAL_CA.LowGamma(:,4), PSD_SAL_CA.HighGamma(:,4)];
+SPSS.BLA_SAL_OA=[PSD_SAL_OA.Delta(:,4), PSD_SAL_OA.Theta(:,4) PSD_SAL_OA.Beta(:,4), PSD_SAL_OA.LowGamma(:,4), PSD_SAL_OA.HighGamma(:,4)];
+
+%VH
+SPSS.VH_GBR_CA=[PSD_GBR_CA.Delta(:,5), PSD_GBR_CA.Theta(:,5) PSD_GBR_CA.Beta(:,5), PSD_GBR_CA.LowGamma(:,5), PSD_GBR_CA.HighGamma(:,5)];
+SPSS.VH_GBR_OA=[PSD_GBR_OA.Delta(:,5), PSD_GBR_OA.Theta(:,5) PSD_GBR_OA.Beta(:,5), PSD_GBR_OA.LowGamma(:,5), PSD_GBR_OA.HighGamma(:,5)];
+SPSS.VH_SAL_CA=[PSD_SAL_CA.Delta(:,5), PSD_SAL_CA.Theta(:,5) PSD_SAL_CA.Beta(:,5), PSD_SAL_CA.LowGamma(:,5), PSD_SAL_CA.HighGamma(:,5)];
+SPSS.VH_SAL_OA=[PSD_SAL_OA.Delta(:,5), PSD_SAL_OA.Theta(:,5) PSD_SAL_OA.Beta(:,5), PSD_SAL_OA.LowGamma(:,5), PSD_SAL_OA.HighGamma(:,5)];
 
