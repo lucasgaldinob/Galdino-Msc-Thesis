@@ -28,11 +28,11 @@ for i=1:nanimais_SAL
     for k=1:(Experiment_Time/2) %Where Experiment_Time is the duration of 
         %the electrophysiological data and 2 is the window determined to windowing
         %Each line is a 2s window
-        Baseline_Segmented(i).PRL(k,:)=Baseline_Data(i).AD01(Start:End,:);
-        Baseline_Segmented(i).NAC(k,:)=Baseline_Data(i).AD02(Start:End,:);
-        Baseline_Segmented(i).VTA(k,:)=Baseline_Data(i).AD03(Start:End,:);
-        Baseline_Segmented(i).BLA(k,:)=Baseline_Data(i).AD04(Start:End,:);
-        Baseline_Segmented(i).HV(k,:)=Baseline_Data(i).AD05(Start:End,:);
+        SAL_Baseline_Segmented(i).PRL(k,:)=Baseline_Data(i).AD01(Start:End,:);
+        SAL_Baseline_Segmented(i).NAC(k,:)=Baseline_Data(i).AD02(Start:End,:);
+        SAL_Baseline_Segmented(i).VTA(k,:)=Baseline_Data(i).AD03(Start:End,:);
+        SAL_Baseline_Segmented(i).BLA(k,:)=Baseline_Data(i).AD04(Start:End,:);
+        SAL_Baseline_Segmented(i).HV(k,:)=Baseline_Data(i).AD05(Start:End,:);
         Start=Start+j;
         End=End+j;
     end
@@ -41,20 +41,20 @@ clear Start End i j k
 
 for i=1:nanimais_SAL
     for j=1:(Experiment_Time/2)
-        if max((Baseline_Segmented(i).PRL(j,:)) <= (1.4*std(Baseline_Data(i).AD01)))  
-            Baseline_Seg(i).PRL(j,:)=Baseline_Segmented(i).PRL(j,:);
+        if max((SAL_Baseline_Segmented(i).PRL(j,:)) <= (1.4*std(Baseline_Data(i).AD01)))  
+            SAL_Baseline_Seg{i,1}(j,:)=SAL_Baseline_Segmented(i).PRL(j,:);
         end
-        if max((Baseline_Segmented(i).NAC(j,:)) <= (1.4*std(Baseline_Data(i).AD02)))  
-            Baseline_Seg(i).NAC(j,:)=Baseline_Segmented(i).NAC(j,:);
+        if max((SAL_Baseline_Segmented(i).NAC(j,:)) <= (1.4*std(Baseline_Data(i).AD02)))  
+            SAL_Baseline_Seg{i,2}(j,:)=SAL_Baseline_Segmented(i).NAC(j,:);
         end
-        if max((Baseline_Segmented(i).VTA(j,:)) <= (1.4*std(Baseline_Data(i).AD03)))  
-            Baseline_Seg(i).VTA(j,:)=Baseline_Segmented(i).VTA(j,:);
+        if max((SAL_Baseline_Segmented(i).VTA(j,:)) <= (1.4*std(Baseline_Data(i).AD03)))  
+            SAL_Baseline_Seg{i,3}(j,:)=SAL_Baseline_Segmented(i).VTA(j,:);
         end  
-        if max((Baseline_Segmented(i).BLA(j,:)) <= (1.4*std(Baseline_Data(i).AD04)))  
-            Baseline_Seg(i).BLA(j,:)=Baseline_Segmented(i).BLA(j,:);
+        if max((SAL_Baseline_Segmented(i).BLA(j,:)) <= (1.4*std(Baseline_Data(i).AD04)))  
+            SAL_Baseline_Seg{i,4}(j,:)=SAL_Baseline_Segmented(i).BLA(j,:);
         end  
-        if max((Baseline_Segmented(i).HV(j,:)) <= (1.4*std(Baseline_Data(i).AD05)))  
-            Baseline_Seg(i).VH(j,:)=Baseline_Segmented(i).HV(j,:); 
+        if max((SAL_Baseline_Segmented(i).HV(j,:)) <= (1.4*std(Baseline_Data(i).AD05)))  
+            SAL_Baseline_Seg{i,5}(j,:)=SAL_Baseline_Segmented(i).HV(j,:); 
         else
             j=j+1;
         end
@@ -63,21 +63,25 @@ for i=1:nanimais_SAL
 end
 
 
+% PSD in each segmented LFP for SAL
+
+WINDOW=2000; %Window length
+Fs=1000; %Sampling rate
+NFFT=4096; %NFFT is the number of points in a window (2s = 1000 NFFT) // no zero padding
+
 for i=1:nanimais_SAL
-    for j=1:300
-        Baseline_SAL(i).PRL=mean(Baseline_Seg(i).PRL,1);
-        Baseline_SAL(i).NAC=mean(Baseline_Seg(i).NAC,1);
-        Baseline_SAL(i).VTA=mean(Baseline_Seg(i).VTA,1);
-        Baseline_SAL(i).BLA=mean(Baseline_Seg(i).BLA,1);
-        Baseline_SAL(i).HV=mean(Baseline_Seg(i).VH,1);
+    Pxx=[];
+    for j=1:size(SAL_Baseline_Seg,2)
+        Pxx=[];
+        for z=1:size(SAL_Baseline_Seg{i, j},1)
+            [Pxx F] = pwelch(SAL_Baseline_Seg{i, j}(z,:),WINDOW,[],NFFT,Fs);
+            Baseline_SAL_All{i, j}(z,:)=Pxx;
+        end
+        Baseline_SAL{i,j}=mean(Baseline_SAL_All{i,j},1); % PSD Average per electrode per animal
     end
 end
-clear Baseline_Data Baseline_Segmented Baseline_Seg i 
+clear Baseline_Data i j SAL_Baseline_Seg SAL_Baseline_Segmented Pxx z Baseline_SAL_All
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% STRUCT BASELINE_SAL IS THE BASELINE DATA FOR LZE DATA NORMALIZATION %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 cd ..
 
 %% Import Baseline GBR Data
@@ -102,11 +106,11 @@ for i=1:nanimais_GBR
         %the electrophysiological data and 2 is the window determined to windowing
         
         %Each line is a 2s window
-        Baseline_Segmented(i).PRL(k,:)=Baseline_Data(i).AD01(Start:End,:);
-        Baseline_Segmented(i).NAC(k,:)=Baseline_Data(i).AD02(Start:End,:);
-        Baseline_Segmented(i).VTA(k,:)=Baseline_Data(i).AD03(Start:End,:);
-        Baseline_Segmented(i).BLA(k,:)=Baseline_Data(i).AD04(Start:End,:);
-        Baseline_Segmented(i).HV(k,:)=Baseline_Data(i).AD05(Start:End,:);
+        GBR_Baseline_Segmented(i).PRL(k,:)=Baseline_Data(i).AD01(Start:End,:);
+        GBR_Baseline_Segmented(i).NAC(k,:)=Baseline_Data(i).AD02(Start:End,:);
+        GBR_Baseline_Segmented(i).VTA(k,:)=Baseline_Data(i).AD03(Start:End,:);
+        GBR_Baseline_Segmented(i).BLA(k,:)=Baseline_Data(i).AD04(Start:End,:);
+        GBR_Baseline_Segmented(i).HV(k,:)=Baseline_Data(i).AD05(Start:End,:);
         Start=Start+j;
         End=End+j;
     end
@@ -116,91 +120,48 @@ clear Start End i j k
 
 for i=1:nanimais_GBR
     for j=1:(Experiment_Time/2)
-        if max((Baseline_Segmented(i).PRL(j,:)) <= (1.4*std(Baseline_Data(i).AD01)))  
-            Baseline_Seg(i).PRL(j,:)=Baseline_Segmented(i).PRL(j,:);
+        if max((GBR_Baseline_Segmented(i).PRL(j,:)) <= (1.4*std(Baseline_Data(i).AD01)))  
+            GBR_Baseline_Seg{i,1}(j,:)=GBR_Baseline_Segmented(i).PRL(j,:);
         end
-        if max((Baseline_Segmented(i).NAC(j,:)) <= (1.4*std(Baseline_Data(i).AD02)))  
-            Baseline_Seg(i).NAC(j,:)=Baseline_Segmented(i).NAC(j,:);
+        if max((GBR_Baseline_Segmented(i).NAC(j,:)) <= (1.4*std(Baseline_Data(i).AD02)))  
+            GBR_Baseline_Seg{i,2}(j,:)=GBR_Baseline_Segmented(i).NAC(j,:);
         end
-        if max((Baseline_Segmented(i).VTA(j,:)) <= (1.4*std(Baseline_Data(i).AD03)))  
-            Baseline_Seg(i).VTA(j,:)=Baseline_Segmented(i).VTA(j,:);
+        if max((GBR_Baseline_Segmented(i).VTA(j,:)) <= (1.4*std(Baseline_Data(i).AD03)))  
+            GBR_Baseline_Seg{i,3}(j,:)=GBR_Baseline_Segmented(i).VTA(j,:);
         end  
-        if max((Baseline_Segmented(i).BLA(j,:)) <= (1.4*std(Baseline_Data(i).AD04)))  
-            Baseline_Seg(i).BLA(j,:)=Baseline_Segmented(i).BLA(j,:);
+        if max((GBR_Baseline_Segmented(i).BLA(j,:)) <= (1.4*std(Baseline_Data(i).AD04)))  
+            GBR_Baseline_Seg{i,4}(j,:)=GBR_Baseline_Segmented(i).BLA(j,:);
         end  
-        if max((Baseline_Segmented(i).HV(j,:)) <= (1.4*std(Baseline_Data(i).AD05)))  
-            Baseline_Seg(i).VH(j,:)=Baseline_Segmented(i).HV(j,:); 
+        if max((GBR_Baseline_Segmented(i).HV(j,:)) <= (1.4*std(Baseline_Data(i).AD05)))  
+            GBR_Baseline_Seg{i,5}(j,:)=GBR_Baseline_Segmented(i).HV(j,:); 
         else
             j=j+1;
         end
             
     end
 end
+clear Baseline_Data GBR_Baseline_Segmented
 
+% PSD in each segmented LFP for GBR
 
-for i=1:nanimais_GBR
-        Baseline_GBR(i).PRL=mean(Baseline_Seg(i).PRL);
-        Baseline_GBR(i).NAC=mean(Baseline_Seg(i).NAC);
-        Baseline_GBR(i).VTA=mean(Baseline_Seg(i).VTA);
-        Baseline_GBR(i).BLA=mean(Baseline_Seg(i).BLA);
-        Baseline_GBR(i).HV=mean(Baseline_Seg(i).VH);
-end
-clear Baseline_Data Baseline_Segmented Baseline_Seg i 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% STRUCT BASELINE_GBR IS THE BASELINE DATA FOR LZE DATA NORMALIZATION %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-cd ..
-%% PSD on Baseline_Data
 WINDOW=2000; %Window length
 Fs=1000; %Sampling rate
 NFFT=4096; %NFFT is the number of points in a window (2s = 1000 NFFT) // no zero padding
 
-% GBR
-for i=1:size(Baseline_SAL,2)
-    [Pxx F] = pwelch(Baseline_SAL(i).PRL,WINDOW,[],NFFT,Fs);
-    Baseline_SAL(i).PRL=Pxx;
-    [Pxx F] = pwelch(Baseline_SAL(i).NAC,WINDOW,[],NFFT,Fs);
-    Baseline_SAL(i).NAC=Pxx;
-    [Pxx F] = pwelch(Baseline_SAL(i).VTA,WINDOW,[],NFFT,Fs);
-    Baseline_SAL(i).VTA=Pxx;
-    [Pxx F] = pwelch(Baseline_SAL(i).BLA,WINDOW,[],NFFT,Fs);
-    Baseline_SAL(i).BLA=Pxx;
-    [Pxx F] = pwelch(Baseline_SAL(i).HV,WINDOW,[],NFFT,Fs);
-    Baseline_SAL(i).HV=Pxx;
-end
-
-%SAL
-for i=1:size(Baseline_GBR,2)
-    [Pxx F] = pwelch(Baseline_GBR(i).PRL,WINDOW,[],NFFT,Fs);
-    Baseline_GBR(i).PRL=Pxx;
-    [Pxx F] = pwelch(Baseline_GBR(i).NAC,WINDOW,[],NFFT,Fs);
-    Baseline_GBR(i).NAC=Pxx;
-    [Pxx F] = pwelch(Baseline_GBR(i).VTA,WINDOW,[],NFFT,Fs);
-    Baseline_GBR(i).VTA=Pxx;
-    [Pxx F] = pwelch(Baseline_GBR(i).BLA,WINDOW,[],NFFT,Fs);
-    Baseline_GBR(i).BLA=Pxx;
-    [Pxx F] = pwelch(Baseline_GBR(i).HV,WINDOW,[],NFFT,Fs);
-    Baseline_GBR(i).HV=Pxx;
-end
-
-%% Transform Baseline struct data into a cell 
 for i=1:nanimais_GBR
-    GBR_Baseline{i,1}=Baseline_GBR(i).PRL;  
-    GBR_Baseline{i,2}=Baseline_GBR(i).NAC;
-    GBR_Baseline{i,3}=Baseline_GBR(i).VTA;  
-    GBR_Baseline{i,4}=Baseline_GBR(i).BLA;
-    GBR_Baseline{i,5}=Baseline_GBR(i).HV;
+    Pxx=[];
+    for j=1:size(GBR_Baseline_Seg,2)
+        Pxx=[];
+        for z=1:size(GBR_Baseline_Seg{i, j},1)
+            [Pxx F] = pwelch(GBR_Baseline_Seg{i, j}(z,:),WINDOW,[],NFFT,Fs);
+            Baseline_GBR_All{i, j}(z,:)=Pxx;
+        end
+        Baseline_GBR{i,j}=mean(Baseline_GBR_All{i,j},1); % PSD Average per electrode per animal   
+    end
 end
-for i=1:nanimais_SAL
-    SAL_Baseline{i,1}=Baseline_SAL(i).PRL;  
-    SAL_Baseline{i,2}=Baseline_SAL(i).NAC;
-    SAL_Baseline{i,3}=Baseline_SAL(i).VTA;  
-    SAL_Baseline{i,4}=Baseline_SAL(i).BLA;
-    SAL_Baseline{i,5}=Baseline_SAL(i).HV;
-end
+clear Baseline_Data i j GBR_Baseline_Seg GBR_Baseline_Segmented Pxx z Baseline_GBR_All
+
+cd ..
 
 % load ('Baseline_Data.mat');
 
@@ -267,7 +228,7 @@ clear File PathName FilterIndex data i T CSV_GBR
 %% Windowing the signal
 
 run LFP_Segmentation.m
-clear Baseline_GBR Baseline_SAL i z init j last LFPjanela LFPjanelaAll Ev Events_GBR_CA Events_GBR_OA Events_SAL_CA Events_SAL_OA LFP_LZE_SAL LFP_LZE_GBR
+clear i z init j last LFPjanela LFPjanelaAll Ev Events_GBR_CA Events_GBR_OA Events_SAL_CA Events_SAL_OA LFP_LZE_SAL LFP_LZE_GBR
 
 
 %% Power Spectrum Density 
@@ -283,8 +244,9 @@ for i=1:nanimais_GBR
         Pxx=[];
         for z=1:size(LFP_WIND_GBR_CA{i, j},1)
             [Pxx F] = pwelch(LFP_WIND_GBR_CA{i, j}(z,:),WINDOW,[],NFFT,Fs);
-            PSD_WIND_GBR_CA{i, j}(z,:)=Pxx-SAL_Baseline{i, j}  ;
+            PSD_WIND_GBR_CA{i, j}(z,:)=Pxx;
         end
+        PSD_WIND_GBR_CA{i, j}(z,:)=((PSD_WIND_GBR_CA{i, j}(z,:))-(Baseline_GBR{i,j}));
     end
 end
 
@@ -294,8 +256,9 @@ for i=1:nanimais_GBR
         Pxx=[];
         for z=1:size(LFP_WIND_GBR_OA{i, j},1)
             [Pxx F] = pwelch(LFP_WIND_GBR_OA{i, j}(z,:),WINDOW,[],NFFT,Fs);
-            PSD_WIND_GBR_OA{i, j}(z,:)=Pxx-SAL_Baseline{i, j}  ;
+            PSD_WIND_GBR_OA{i, j}(z,:)=Pxx;
         end
+        PSD_WIND_GBR_OA{i, j}(z,:)=((PSD_WIND_GBR_OA{i, j}(z,:))-(Baseline_GBR{i,j}));
     end
 end
 
@@ -305,20 +268,27 @@ for i=1:nanimais_SAL
         Pxx=[];
         for z=1:size(LFP_WIND_SAL_CA{i, j},1)
             [Pxx F] = pwelch(LFP_WIND_SAL_CA{i, j}(z,:),WINDOW,[],NFFT,Fs);
-            PSD_WIND_SAL_CA{i, j}(z,:)=Pxx-SAL_Baseline{i, j}  ;
+            PSD_WIND_SAL_CA{i, j}(z,:)=Pxx;
         end
+        PSD_WIND_SAL_CA{i, j}(z,:)=((PSD_WIND_SAL_CA{i, j}(z,:))-(Baseline_SAL{i,j}));
     end
 end
 
+clear i j pxx 
 for i=1:nanimais_SAL
     Pxx=[];
     for j=1:size(LFP_WIND_SAL_OA,2)
         Pxx=[];
-        for z=1:size(LFP_WIND_SAL_OA{i, j},1)
+        for z=1:size(LFP_WIND_SAL_OA{i, j},1) 
             [Pxx F] = pwelch(LFP_WIND_SAL_OA{i, j}(z,:),WINDOW,[],NFFT,Fs);
-            PSD_WIND_SAL_OA{i, j}(z,:)=Pxx-SAL_Baseline{i, j}  ;
+            PSD_WIND_SAL_OA{i, j}(z,:)=Pxx;
         end
+        PSD_WIND_SAL_OA{i, j}(z,:)=((PSD_WIND_SAL_OA{i, j}(z,:))-(Baseline_SAL{i,j}));
     end
+end
+
+if PSD_WIND_SAL_OA{1,1}==[]
+    PSD_WIND_SAL_OA{1,:}=[];
 end
 
 %% Cat all LFP segments
