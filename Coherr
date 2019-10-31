@@ -1,0 +1,433 @@
+clear 
+clc
+close all
+
+%% Data parameters
+Fs = 1000;
+Experiment_Time = 600; %600 seconds = 10 minutes
+
+% Filters
+not60 = designfilt('bandstopiir','FilterOrder',2, ...
+               'HalfPowerFrequency1',59,'HalfPowerFrequency2',61, ...
+               'DesignMethod','butter','SampleRate',Fs);
+lowp = designfilt('lowpassiir','FilterOrder',4, ...
+         'PassbandFrequency',100,'PassbandRipple',0.2, ...
+         'SampleRate',Fs);
+
+cd 'C:\Users\Galdino\OneDrive\Mestrado Neuroengenharia\Dissertação\Experimento 2 - Eletrofisiologia\Analise_Mania_Eletrofisio'
+
+%% Import Baseline SAL Data
+cd ./Baseline_SAL
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select SAL Baseline file','MultiSelect','on');
+data = [PathName File];
+nanimais_SAL=length(File);
+
+%Create a structure based on the parameters defined above
+for i=1:nanimais_SAL
+    Baseline_Data(i)=importdata([PathName File{:,i}]);
+end
+clear File PathName FilterIndex data i
+
+% Filtering signal
+for i=1:nanimais_SAL
+    Baseline_Data(i).AD01=filtfilt(lowp,Baseline_Data(i).AD01);
+    Baseline_Data(i).AD01=filtfilt(not60,Baseline_Data(i).AD01);
+    Baseline_Data(i).AD02=filtfilt(lowp,Baseline_Data(i).AD02);
+    Baseline_Data(i).AD02=filtfilt(not60,Baseline_Data(i).AD02);
+    Baseline_Data(i).AD03=filtfilt(lowp,Baseline_Data(i).AD03);
+    Baseline_Data(i).AD03=filtfilt(not60,Baseline_Data(i).AD03);
+    Baseline_Data(i).AD04=filtfilt(lowp,Baseline_Data(i).AD04);
+    Baseline_Data(i).AD04=filtfilt(not60,Baseline_Data(i).AD04);
+    Baseline_Data(i).AD05=filtfilt(lowp,Baseline_Data(i).AD05);
+    Baseline_Data(i).AD05=filtfilt(not60,Baseline_Data(i).AD05);
+end
+
+%Loop to create 300 windows containing 2s data
+for i=1:nanimais_SAL
+    Start=1;
+    End=2000;
+    j=2000;
+    for k=1:(Experiment_Time/2) %Where Experiment_Time is the duration of 
+        %the electrophysiological data and 2 is the window determined to windowing
+        %Each line is a 2s window
+        SAL_Baseline_Segmented(i).PRL(k,:)=Baseline_Data(i).AD01(Start:End,:);
+        SAL_Baseline_Segmented(i).NAC(k,:)=Baseline_Data(i).AD02(Start:End,:);
+        SAL_Baseline_Segmented(i).VTA(k,:)=Baseline_Data(i).AD03(Start:End,:);
+        SAL_Baseline_Segmented(i).BLA(k,:)=Baseline_Data(i).AD04(Start:End,:);
+        SAL_Baseline_Segmented(i).HV(k,:)=Baseline_Data(i).AD05(Start:End,:);
+        Start=Start+j;
+        End=End+j;
+    end
+end
+clear Start End i j k 
+
+for i=1:nanimais_SAL
+    for j=1:(Experiment_Time/2)
+        if max((SAL_Baseline_Segmented(i).PRL(j,:)) <= (1.4*std(Baseline_Data(i).AD01)))  
+            SAL_Baseline_Seg{i,1}(j,:)=SAL_Baseline_Segmented(i).PRL(j,:);
+        end
+        if max((SAL_Baseline_Segmented(i).NAC(j,:)) <= (1.4*std(Baseline_Data(i).AD02)))  
+            SAL_Baseline_Seg{i,2}(j,:)=SAL_Baseline_Segmented(i).NAC(j,:);
+        end
+        if max((SAL_Baseline_Segmented(i).VTA(j,:)) <= (1.4*std(Baseline_Data(i).AD03)))  
+            SAL_Baseline_Seg{i,3}(j,:)=SAL_Baseline_Segmented(i).VTA(j,:);
+        end  
+        if max((SAL_Baseline_Segmented(i).BLA(j,:)) <= (1.4*std(Baseline_Data(i).AD04)))  
+            SAL_Baseline_Seg{i,4}(j,:)=SAL_Baseline_Segmented(i).BLA(j,:);
+        end  
+        if max((SAL_Baseline_Segmented(i).HV(j,:)) <= (1.4*std(Baseline_Data(i).AD05)))  
+            SAL_Baseline_Seg{i,5}(j,:)=SAL_Baseline_Segmented(i).HV(j,:); 
+        else
+            j=j+1;
+        end
+            
+    end
+end
+
+clear Baseline_Data i j SAL_Baseline_Segmented
+
+for i=1:size(SAL_Baseline_Seg,1)
+    for j=1:size(SAL_Baseline_Seg,2)
+        Baseline_Sal{i,j}=mean(SAL_Baseline_Seg{i,j},1);
+    end
+end
+clear SAL_Baseline_Seg
+
+
+cd ..
+%% Import Baseline GBR Data
+
+cd ./Baseline_GBR
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select GBR Baseline file','MultiSelect','on');
+data = [PathName File];
+nanimais_GBR=length(File);
+
+%Create a structure based on the parameters defined above
+for i=1:nanimais_GBR
+    Baseline_Data(i)=importdata([PathName File{:,i}]);
+end
+clear File PathName FilterIndex data i
+
+% Filtering signal
+for i=1:nanimais_GBR
+    Baseline_Data(i).AD01=filtfilt(lowp,Baseline_Data(i).AD01);
+    Baseline_Data(i).AD01=filtfilt(not60,Baseline_Data(i).AD01);
+    Baseline_Data(i).AD02=filtfilt(lowp,Baseline_Data(i).AD02);
+    Baseline_Data(i).AD02=filtfilt(not60,Baseline_Data(i).AD02);
+    Baseline_Data(i).AD03=filtfilt(lowp,Baseline_Data(i).AD03);
+    Baseline_Data(i).AD03=filtfilt(not60,Baseline_Data(i).AD03);
+    Baseline_Data(i).AD04=filtfilt(lowp,Baseline_Data(i).AD04);
+    Baseline_Data(i).AD04=filtfilt(not60,Baseline_Data(i).AD04);
+    Baseline_Data(i).AD05=filtfilt(lowp,Baseline_Data(i).AD05);
+    Baseline_Data(i).AD05=filtfilt(not60,Baseline_Data(i).AD05);
+end
+
+%Loop to create 300
+for i=1:nanimais_GBR
+    Start=1;
+    End=2000;
+    j=2000;
+    for k=1:(Experiment_Time/2) %Where Experiment_Time is the duration of 
+        %the electrophysiological data and 2 is the window determined to windowing
+        
+        %Each line is a 2s window
+        GBR_Baseline_Segmented(i).PRL(k,:)=Baseline_Data(i).AD01(Start:End,:);
+        GBR_Baseline_Segmented(i).NAC(k,:)=Baseline_Data(i).AD02(Start:End,:);
+        GBR_Baseline_Segmented(i).VTA(k,:)=Baseline_Data(i).AD03(Start:End,:);
+        GBR_Baseline_Segmented(i).BLA(k,:)=Baseline_Data(i).AD04(Start:End,:);
+        GBR_Baseline_Segmented(i).HV(k,:)=Baseline_Data(i).AD05(Start:End,:);
+        Start=Start+j;
+        End=End+j;
+    end
+end
+clear Start End i j k 
+
+
+for i=1:nanimais_GBR
+    for j=1:(Experiment_Time/2)
+        if max((GBR_Baseline_Segmented(i).PRL(j,:)) <= (1.4*std(Baseline_Data(i).AD01)))  
+            GBR_Baseline_Seg{i,1}(j,:)=GBR_Baseline_Segmented(i).PRL(j,:);
+        end
+        if max((GBR_Baseline_Segmented(i).NAC(j,:)) <= (1.4*std(Baseline_Data(i).AD02)))  
+            GBR_Baseline_Seg{i,2}(j,:)=GBR_Baseline_Segmented(i).NAC(j,:);
+        end
+        if max((GBR_Baseline_Segmented(i).VTA(j,:)) <= (1.4*std(Baseline_Data(i).AD03)))  
+            GBR_Baseline_Seg{i,3}(j,:)=GBR_Baseline_Segmented(i).VTA(j,:);
+        end  
+        if max((GBR_Baseline_Segmented(i).BLA(j,:)) <= (1.4*std(Baseline_Data(i).AD04)))  
+            GBR_Baseline_Seg{i,4}(j,:)=GBR_Baseline_Segmented(i).BLA(j,:);
+        end  
+        if max((GBR_Baseline_Segmented(i).HV(j,:)) <= (1.4*std(Baseline_Data(i).AD05)))  
+            GBR_Baseline_Seg{i,5}(j,:)=GBR_Baseline_Segmented(i).HV(j,:); 
+        else
+            j=j+1;
+        end
+            
+    end
+end
+clear Baseline_Data i j GBR_Baseline_Segmented
+
+for i=1:size(GBR_Baseline_Seg,1)
+    for j=1:size(GBR_Baseline_Seg,2)
+        Baseline_Gbr{i,j}=mean(GBR_Baseline_Seg{i,j},1);
+    end
+end
+clear GBR_Baseline_Seg
+
+cd ..
+%% Import SAL LZE file (number of animals must be the same)
+cd ./LZE_SAL
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select SAL LZE file','MultiSelect','on');
+data = [PathName File];
+nanimais_SAL=length(File);
+
+%Create a structure based on the parameters defined above
+for i=1:nanimais_SAL
+    LFP_LZE_SAL(i)=importdata([PathName File{:,i}]);
+end
+clear File PathName FilterIndex data i
+
+% Filtering signal
+for i=1:nanimais_SAL
+    LFP_LZE_SAL(i).AD01=filtfilt(lowp,LFP_LZE_SAL(i).AD01);
+    LFP_LZE_SAL(i).AD01=filtfilt(not60,LFP_LZE_SAL(i).AD01);
+    LFP_LZE_SAL(i).AD02=filtfilt(lowp,LFP_LZE_SAL(i).AD02);
+    LFP_LZE_SAL(i).AD02=filtfilt(not60,LFP_LZE_SAL(i).AD02);
+    LFP_LZE_SAL(i).AD03=filtfilt(lowp,LFP_LZE_SAL(i).AD03);
+    LFP_LZE_SAL(i).AD03=filtfilt(not60,LFP_LZE_SAL(i).AD03);
+    LFP_LZE_SAL(i).AD04=filtfilt(lowp,LFP_LZE_SAL(i).AD04);
+    LFP_LZE_SAL(i).AD04=filtfilt(not60,LFP_LZE_SAL(i).AD04);
+    LFP_LZE_SAL(i).AD05=filtfilt(lowp,LFP_LZE_SAL(i).AD05);
+    LFP_LZE_SAL(i).AD05=filtfilt(not60,LFP_LZE_SAL(i).AD05);
+end
+
+cd ..
+%% Import GBR LZE file (number of animals must be the same)
+cd ./LZE_GBR
+[File,PathName,FilterIndex] = uigetfile({'*.*','mat(*.*)'}, 'Select GBR LZE file','MultiSelect','on');
+data = [PathName File];
+nanimais_GBR=length(File);
+
+%Create a structure based on the parameters defined above
+for i=1:nanimais_GBR
+    LFP_LZE_GBR(i)=importdata([PathName File{:,i}]);
+end
+clear File PathName FilterIndex data i
+
+% Filtering signal
+for i=1:nanimais_GBR
+    LFP_LZE_GBR(i).AD01=filtfilt(lowp,LFP_LZE_GBR(i).AD01);
+    LFP_LZE_GBR(i).AD01=filtfilt(not60,LFP_LZE_GBR(i).AD01);
+    LFP_LZE_GBR(i).AD02=filtfilt(lowp,LFP_LZE_GBR(i).AD02);
+    LFP_LZE_GBR(i).AD02=filtfilt(not60,LFP_LZE_GBR(i).AD02);
+    LFP_LZE_GBR(i).AD03=filtfilt(lowp,LFP_LZE_GBR(i).AD03);
+    LFP_LZE_GBR(i).AD03=filtfilt(not60,LFP_LZE_GBR(i).AD03);
+    LFP_LZE_GBR(i).AD04=filtfilt(lowp,LFP_LZE_GBR(i).AD04);
+    LFP_LZE_GBR(i).AD04=filtfilt(not60,LFP_LZE_GBR(i).AD04);
+    LFP_LZE_GBR(i).AD05=filtfilt(lowp,LFP_LZE_GBR(i).AD05);
+    LFP_LZE_GBR(i).AD05=filtfilt(not60,LFP_LZE_GBR(i).AD05);
+end
+
+cd ..
+%% Identify Events of LZE_SAL
+cd ./CSV_SAL
+[File,PathName,FilterIndex] = uigetfile({'*.*','CSV(*.*)'}, 'Selecione o CSV referente ao grupo SAL','MultiSelect','on');
+data = [PathName File];
+
+cd ..
+
+for i=1:nanimais_SAL
+    CSV_SAL(i).data=importdata([PathName File{:,i}]);
+    CSV_SAL(i).data=matrixcorrection(CSV_SAL(i).data);
+    CSV_SAL(i).data=CSVreal(CSV_SAL(i).data);
+    Events_SAL_CA(i).data=Events_CA(CSV_SAL(i).data);
+    Events_SAL_OA(i).data=Events_OA(CSV_SAL(i).data);
+end
+clear File PathName FilterIndex data i T CSV_SAL 
+
+
+%% Identify Events of LZE_GBR
+cd ./CSV_GBR
+[File,PathName,FilterIndex] = uigetfile({'*.*','CSV(*.*)'}, 'Selecione o CSV referente ao grupo GBR ','MultiSelect','on');
+data = [PathName File];
+
+
+
+for i=1:nanimais_GBR
+    CSV_GBR(i).data=importdata([PathName File{:,i}]);
+    CSV_GBR(i).data=matrixcorrection(CSV_GBR(i).data);
+    CSV_GBR(i).data=CSVreal(CSV_GBR(i).data);
+    Events_GBR_CA(i).data=(Events_CA(CSV_GBR(i).data))+(CSV_GBR(1).data(2,1));
+    Events_GBR_OA(i).data=(Events_OA(CSV_GBR(i).data))+(CSV_GBR(1).data(2,1));
+end
+clear File PathName FilterIndex data i T CSV_GBR
+
+%% Windowing the signal
+
+run LFP_Segmentation.m
+clear i z init j last LFPjanela LFPjanelaAll Ev Events_GBR_CA Events_GBR_OA Events_SAL_CA Events_SAL_OA LFP_LZE_SAL LFP_LZE_GBR
+
+%% Data normalization 
+Lfp_Gbr_CA={};
+for i = 1:nanimais_GBR
+    for j = 1:size(LFP_WIND_GBR_CA,2)
+        for k = 1:size(LFP_WIND_GBR_CA{i,j},1)
+            Lfp_Gbr_CA{i,j}(k,:)=(LFP_WIND_GBR_CA{i, j}(k,:))-(Baseline_Gbr{i, j});  
+        end
+    end
+end
+
+        
+Lfp_Gbr_OA={};
+for i = 1:nanimais_GBR
+    for j = 1:size(LFP_WIND_GBR_OA,2)
+        for k = 1:size(LFP_WIND_GBR_OA{i,j},1)
+            Lfp_Gbr_OA{i,j}(k,:)=(LFP_WIND_GBR_OA{i, j}(k,:))-(Baseline_Gbr{i, j});  
+        end
+    end
+end
+        
+        
+Lfp_Sal_CA={};
+for i = 1:nanimais_SAL
+    for j = 1:size(LFP_WIND_SAL_CA,2)
+        for k = 1:size(LFP_WIND_SAL_CA{i,j},1)
+            Lfp_Sal_CA{i,j}(k,:)=(LFP_WIND_SAL_CA{i, j}(k,:))-(Baseline_Sal{i, j});  
+        end
+    end
+end
+
+        
+Lfp_Sal_OA={};
+for i = 1:nanimais_SAL
+    for j = 1:size(LFP_WIND_SAL_OA,2)
+        for k = 1:size(LFP_WIND_SAL_OA{i,j},1)
+            Lfp_Sal_OA{i,j}(k,:)=(LFP_WIND_SAL_OA{i, j}(k,:))-(Baseline_Sal{i, j});  
+        end
+    end
+end
+
+clear LFP_WIND_GBR_CA LFP_WIND_GBR_OA LFP_WIND_SAL_OA LFP_WIND_SAL_CA Baseline_Gbr Baseline_Sal
+
+%% 
+
+clear
+load ('Pre_Corr.mat')
+clc
+
+epochSiz=2000; %2 seconds
+win=epochSiz/4; 
+overlap=win/2;
+nfft=2^10;
+
+%% One segment (First animal, first window between PRL e NAC
+LFP1=Lfp_Gbr_CA{1,1}(1,:);
+LFP2=Lfp_Gbr_CA{1,2}(1,:);
+
+[Cxy, F] = mscohere(LFP1, LFP2, win, overlap, nfft, Fs);
+plot (F, Cxy)
+xlim ([0 100])
+
+clear LFP1 LFP2 Cxy F
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+tic
+Cxy=[];
+for n=1:nanimais_GBR
+    Coherr_GBR={};
+    for i=1:size(Lfp_Gbr_CA,2)
+        for j=(i+1):size(Lfp_Gbr_CA,2)
+            k=[];
+            for k=1:size(Lfp_Gbr_CA{n,1},1)
+                LFP1=[];
+                LFP2=[];
+                LFP1=Lfp_Gbr_CA{n,i}(k,:);
+                LFP2=Lfp_Gbr_CA{n,j}(k,:);
+                
+                [Cxy, F] = mscohere(LFP1,LFP2,win,overlap,nfft,Fs);
+                Coherr_GBR{i,j}(k,:) = Cxy;
+            end
+        end
+    end
+    Coherr{n,1}=Coherr_GBR; %GBR Closed Arm
+end
+
+Cxy=[];
+for n=1:nanimais_GBR
+    Coherr_GBR={};
+    for i=1:size(Lfp_Gbr_OA,2)
+        for j=(i+1):size(Lfp_Gbr_OA,2)
+            k=[];
+            for k=1:size(Lfp_Gbr_OA{n,1},1)
+                LFP1=[];
+                LFP2=[];
+                LFP1=Lfp_Gbr_OA{n,i}(k,:);
+                LFP2=Lfp_Gbr_OA{n,j}(k,:);
+                
+                [Cxy, F] = mscohere(LFP1,LFP2,win,overlap,nfft,Fs);
+                Coherr_GBR{i,j}(k,:) = Cxy;
+            end
+        end
+    end
+    Coherr{n,2}=Coherr_GBR; %GBR Open Arm
+end
+
+% SAL
+Cxy=[];
+for n=1:nanimais_SAL
+    Coherr_Sal={};
+    for i=1:size(Lfp_Sal_CA,2)
+        for j=(i+1):size(Lfp_Sal_CA,2)
+            k=[];
+            for k=1:size(Lfp_Sal_CA{n,1},1)
+                LFP1=[];
+                LFP2=[];
+                LFP1=Lfp_Sal_CA{n,i}(k,:);
+                LFP2=Lfp_Sal_CA{n,j}(k,:);
+                
+                [Cxy, F] = mscohere(LFP1,LFP2,win,overlap,nfft,Fs);
+                Coherr_Sal{i,j}(k,:) = Cxy;
+            end
+        end
+    end
+    Coherr{n,3}=Coherr_Sal; %SAL Closed Arm
+end
+
+Cxy=[];
+for n=1:nanimais_SAL
+    Coherr_Sal={};
+    for i=1:size(Lfp_Sal_OA,2)
+        for j=(i+1):size(Lfp_Sal_OA,2)
+            k=[];
+            for k=1:size(Lfp_Sal_OA{n,1},1)
+                LFP1=[];
+                LFP2=[];
+                LFP1=Lfp_Sal_OA{n,i}(k,:);
+                LFP2=Lfp_Sal_OA{n,j}(k,:);
+                
+                [Cxy, F] = mscohere(LFP1,LFP2,win,overlap,nfft,Fs);
+                Coherr_Sal{i,j}(k,:) = Cxy;
+            end
+        end
+    end
+    Coherr{n,4}=Coherr_Sal; %SAL Open Arm
+end
+toc
+%%
+
+Cxy=[];
+LFP1={};
+LFP2={};
+
+[Cxy, F] = mscohere(LFP1,LFP2,win,OVERLAP,nfft,Fs);
+plot (F,Cxy)
+xlim ([1 100])
+
+%Bandwidths index
+Delta = (F>=1 & F<=4);
+Theta = (F>=4 & F<=11);
+Beta = (F>=15 & F<=25);
+LowGamma = (F>=30 & F<=55);
+HighGamma = (F>=70 & F<=100);
+
+
+
